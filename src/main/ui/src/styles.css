@@ -1,0 +1,96 @@
+/* Application-wide Styles */
+h1 {
+  color: #369;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 200%;
+  margin-bottom: 0px;
+  background: gold;
+  border: 1px solid black;
+}
+h2, h3 {
+  color: #444;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: lighter;
+/*  background: gold; */
+}
+body {
+  margin: 2em;
+  color: #333;
+  font-family: Cambria, Georgia, serif;
+}
+/* everywhere else */
+* {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  font-size: 12px;
+}
+
+.number-icon-blue {
+  box-sizing: border-box;
+  background-image: url("assets/number-marker-icon.png");
+  padding: 5px 0 0 0;
+  text-align:center;
+  color:black;
+}
+
+.number-icon-warning {
+  box-sizing: border-box;
+  background-image: url("assets/number-marker-icon-warning.png");
+  padding: 5px 0 0 0;
+  text-align:center;
+  color:black;
+}
+
+.number-icon-green {
+  box-sizing: border-box;
+  background-image: url("assets/number-marker-icon-green.png");
+  padding: 5px 0 0 0;
+  text-align:center;
+  color:black;
+}
+
+.number-icon-yellow {
+  box-sizing: border-box;
+  background-image: url("assets/number-marker-icon-yellow.png");
+  padding: 5px 0 0 0;
+  text-align:center;
+  color:black;
+}
+
+.number-icon-orange {
+  box-sizing: border-box;
+  background-image: url("assets/number-marker-icon-orange.png");
+  padding: 5px 0 0 0;
+  text-align:center;
+  color:black;
+}
+
+.number-icon-red {
+  box-sizing: border-box;
+  background-image: url("assets/number-marker-icon-red.png");
+  padding: 5px 0 0 0;
+  text-align:center;
+  color:black;
+}
+
+.number-icon-purple {
+  box-sizing: border-box;
+  background-image: url("assets/number-marker-icon-purple.png");
+  padding: 5px 0 0 0;
+  text-align:center;
+  color:black;
+}
+
+.number-icon-fetlila {
+  box-sizing: border-box;
+  background-image: url("assets/number-marker-icon-fetlila.png");
+  padding: 5px 0 0 0;
+  text-align:center;
+  color:black;
+}
+
+.p-toast-detail {
+  white-space: pre-line;
+}

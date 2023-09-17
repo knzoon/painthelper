@@ -1,0 +1,176 @@
+.pageHeader {
+  color: #369;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 200%;
+ /* margin-bottom: 10px;
+    background: gold;
+    border: 1px solid black; */
+}
+
+
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+/*  background: pink;
+  border: 1px solid black; */
+}
+
+.box .searching-container {
+  flex: 1 1 auto;
+/*  background: cornflowerblue; */
+}
+
+.user {
+/*  background: aquamarine; */
+}
+
+.tableHeader {
+  margin-top: 10px;
+}
+
+.table {
+  /*max-height: 150px;*/
+  /*min-height: 5px;*/
+  overflow: auto;
+  margin-bottom: 10px;
+}
+
+.box .map-container {
+  flex: 0 0 75vh;
+  border: 1px solid black;
+  /*  background: lightblue; */
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+.searchButton {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.row {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.spaced {
+  margin-left: 20px;
+}
+
+.topSpace {
+  margin-top: 5px;
+}
+
+.head1 {
+  width: 120px;
+  min-width: 120px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  /*background: sandybrown;*/
+}
+
+.head2 {
+  width: 140px;
+  min-width: 140px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  /*background: saddlebrown;*/
+}
+
+.head3 {
+  width: 25px;
+  min-width: 25px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  /*background: rosybrown;*/
+}
+
+.col1 {
+  width: 120px;
+  min-width: 120px;
+  overflow: hidden;
+  margin: 1px 0px;
+  /*background: sandybrown;*/
+}
+
+.col2 {
+  width: 140px;
+  min-width: 140px;
+  overflow: hidden;
+  margin: 1px 0px;
+  /*background: saddlebrown;*/
+}
+
+.col3 {
+  width: 25px;
+  min-width: 25px;
+  overflow: hidden;
+  text-align: right;
+  margin: 1px 0px;
+  /*background: rosybrown;*/
+}
+
+.file-input {
+  display: none;
+}
+
+.untakenbox {
+  width: 40px;
+  border: 3px solid red;
+  background: yellow;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+}
+
+.greenbox {
+  width: 40px;
+  border: 3px solid green;
+  background: green;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+}
+
+.yellowbox {
+  width: 40px;
+  border: 3px solid yellow;
+  background: yellow;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+}
+
+.orangebox {
+  width: 40px;
+  border: 3px solid orange;
+  background: orange;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+}
+
+.redbox {
+  width: 40px;
+  border: 3px solid red;
+  background: red;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+}
+
+.purplebox {
+  width: 40px;
+  border: 3px solid mediumpurple;
+  background: mediumpurple;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-align: center;
+}

@@ -1,0 +1,194 @@
+<!--<div class="box">-->
+<!--  <div class="searching-container">-->
+<as-split direction="vertical">
+  <as-split-area [size]="40" [minSize]="11">
+    <div class="row">
+      <div class="pageHeader">
+        Painthelper
+      </div>
+      <div class="row">
+        <div class="spaced">
+          <p-button icon="pi pi-user" label="Import" (click)="showUploadModalDialog()"></p-button>
+          <!--        <p-button label="TestArne" (click)="testingPopulatingRegion()"></p-button>-->
+          <p-toast position="top-center"></p-toast>
+          <p-dialog header="Importera användare från warded.se" [(visible)]="displayModal" [modal]="true" [style]="{width: '75vw'}" [draggable]="false" [resizable]="false">
+            <p class="m-0">
+              För att kunna använda denna sida behöver du skapa en användare och importera data för de regioner som du vill söka i. Det gör du på följande vis:
+            </p>
+            <ul>
+              <li>Logga in på warded.se</li>
+              <li>Gå in på sidan "Map of my unique zones"<br><img src="assets/help/linkForMOU.jpg"></li>
+              <li>Välj Global i dropdown för att få med alla regioner<br><img src="assets/help/global.jpg"></li>
+              <li>Högerklicka utanför kartan</li>
+              <li>Välj "Spara som..."<br><img src="assets/help/rightclick.jpg"></li>
+            </ul>
+            <p class="m-0">
+              När du gjort det så klickar du på knappen nedan "Importera" och väljer filen du sparade innan.<br>
+              OBSERVERA att du bör importera en nyligt sparad fil. Alla takes du gör mellan du sparat filen och importerar den kommer att försvinna.
+            </p>
+            <input type="file" accept="text/html" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+            <ng-template pTemplate="footer">
+              <p-button icon="pi pi-check" label="Importera" styleClass="p-button-text" (click)="fileUpload.click()"></p-button>
+            </ng-template>
+          </p-dialog>
+        </div>
+        <div class="spaced">
+            <p-button icon="pi pi-question" (click)="showHelpModalDialog()"></p-button>
+            <p-dialog header="Ett försök till hjälp att få ut det mesta av Painthelper" [(visible)]="displayHelpModal" [modal]="true" [style]="{width: '75vw'}" [draggable]="false" [resizable]="false">
+              <h2>Vad är Painthelper</h2>
+              <p>
+                Painthelper är som namnet avslöjar ett hjälpmedel för att kunna "måla" med Turf. Dvs utifrån färgerna som visas på heatmap'en på warded.se<br>
+                Painthelper är som de två sidorna "Map of my unique zones" och "Map of my never taken zones" på warded.se i en. Dessutom med möjlighet att filtrera på antalet takes och dessutom på Area/Kommun
+              </p>
+              <h2>Skaffa en användare</h2>
+              <p>
+                Det första du behöver göra för att kunna använda Painthelper är att skaffa en användare. Det gör du genom att klicka på knappen Import och följa instruktionerna som kommer i dialogen
+              </p>
+              <p>
+                <b>Observera</b> att det inte är något inloggningsförfarande i Painthelper så när du skaffar en användare så kommer informationen om dina tagna zoner bli publik. Dvs vem som helst kommer kunna se dina tagna zoner
+              </p>
+              <h2>"Inlogging"</h2>
+              <p>
+                För att komma åt din användare du skapat genom import så börjar du skriva in ditt användarnamn i rutan som ser ut som nedan.<br>
+                <img src="assets/help/user.jpg"><br>
+                Den bryr sig inte om stora eller små bokstäver och för varje bokstav du skriver så kommer färre och färre förslag upp i dropdownen.
+
+              </p>
+              <h2>Filtrering</h2>
+              <p>
+                I Painthelper jobbar du med en region i taget. Vilken region du ska se zoner för väljer du i denna dropdown<br>
+                <img src="assets/help/region.jpg">
+              </p>
+              <p>
+                Du Filtrerar/begränsar din sökning genom att ange "Tagen minst" och "Tagen max" och om du vill genom att välja en Area. I parentes bakom namnet för area visas antalet tagna zoner.<br>
+                <img src="assets/help/areaUmea.jpg"><br>
+                Om ingen valts så visas zoner för samtliga areas i regionen.
+              </p>
+              <p>
+                Avslutningsvis klickar du på sökknappen. Notera att antalet funna zoner utifrån filtrering visas ovanför sökknappen. Här nedan alla fetlila zoner i Umeå kommun<br>
+                <img src="assets/help/fetlila.jpg"><br>
+              </p>
+              <h2>Summering</h2>
+              <p>
+                Ovanför sökresultaten visas hur många zoner du tagit i respektive intervall. Det som avviker från färgkodningen i warded är otagna zoner som visas som gula med en röd ram runt.<br>
+                Om du valt en area så visas summering för den, annars för hela regionen.<br>
+                <img src="assets/help/summary.jpg"><br>
+              </p>
+              <h2>Användartips</h2>
+              <p>
+                Om du t ex har som omgångsmål att få färre gula zoner kan du söka fram zoner som är närmast att bli orange på detta vis:<br>
+                <img src="assets/help/almostOrange.jpg"><br>
+                Genom att sen klicka på en zon i listan så centreras kartan runt denna zon.
+              </p>
+              <h2>Frågor, feedback</h2>
+              <p>
+                Jag har gjort denna sida på min fritid (som är rätt så begränsad) men det är ändå värt att skicka in frågor eller felrapporter så försöker jag angripa det så fort jag har möjlighet.
+              </p>
+              <p>
+                <img src="assets/help/mail.jpg">
+              </p>
+            </p-dialog>
+        </div>
+      </div>
+    </div>
+    <div class="user">
+      <div class="row" *ngIf=displaySpinner>
+        Utför import, hav tålamod då det kan ta upp till en minut <p-progressSpinner></p-progressSpinner>
+      </div>
+      <div class="row">
+          <i class="pi pi-user"></i>&nbsp;
+          <p-autoComplete [(ngModel)]="selectedUser" [showEmptyMessage]="true" emptyMessage="Ingen användare hittad" [suggestions]="suggestedUsers" (completeMethod)="searchUsers($event)" field="username" [minLength]="1" [size]="6" (onSelect)="userChanged($event)"></p-autoComplete>
+          <div *ngIf="errorFindingUser == undefined" class="spaced">
+            <p-dropdown [options]="regionTakes" [(ngModel)]="selectedRegion" placeholder="Välj region" optionLabel="regionName" (onChange)="chooseRegion()" ></p-dropdown>
+          </div>
+      </div>
+    </div>
+    <div *ngIf="selectedRegion">
+      <div class="grid grid-nogutter text-sm">
+        <div class="col-fixed" style="width: 80px">
+          <div class="grid grid-nogutter">
+            <div class="col-12">
+              <label for="minTakes" >Tagen minst:</label>
+            </div>
+            <div class="col-12">
+              <p-inputNumber inputId="minTakes" [(ngModel)]="minTakes" mode="decimal" [size]="4" [min]="0" [max]="9999" placeholder="0-9999"></p-inputNumber>
+            </div>
+          </div>
+        </div>
+        <div class="col-fixed" style="width: 80px">
+          <div class="grid grid-nogutter">
+            <div class="col-12">
+              <label for="maxTakes" >Tagen max:</label>
+            </div>
+            <div class="col-12">
+              <p-inputNumber inputId="maxTakes" [(ngModel)]="maxTakes" mode="decimal" [size]="4" [min]="0" [max]="9999" placeholder="0-9999"></p-inputNumber>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-fixed">
+          <div class="grid grid-nogutter">
+            <div class="col-12">
+              <label for="onlyRound">Endast omgång</label>
+            </div>
+            <div class="grid grid-nogutter">
+              <div class="col-12">
+                <p-checkbox [binary]="true" [(ngModel)]="searchRoundOnly" inputId="=onlyRound" ></p-checkbox>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-fixed">
+          <div class="grid grid-nogutter">
+            <div class="col-12">
+              <label for="areaSelect" >Area:</label>
+            </div>
+            <div class="col-12">
+              <p-dropdown id="areaSelect" [options]="areas" [(ngModel)]="selectedArea" placeholder="Samtliga areor" optionLabel="areaName" [disabled]="areasMissing()" [showClear]="true" (onChange)="chooseArea()"></p-dropdown>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="grid grid-nogutter">
+            <div class="col-12">
+              <label for="searchButton" >Funna: <b>{{zones.length}}</b></label>
+            </div>
+            <div class="col-12">
+              <p-button id="searchButton" icon="pi pi-search" label="Zoner" [disabled]="searchButtonIsDisabled()" (click)="getZones()"></p-button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row topSpace">
+        <div class="untakenbox"><span class="font-bold">{{untakenBox}}</span> {{untakenBoxPercent}}</div>
+        <div class="greenbox"><span class="font-bold">{{greenbox}}</span> {{greenboxPercent}}</div>
+        <div class="yellowbox"><span class="font-bold">{{yellowbox}}</span> {{yellowboxPercent}}</div>
+        <div class="orangebox"><span class="font-bold">{{orangebox}}</span> {{orangeboxPercent}}</div>
+        <div class="redbox"><span class="font-bold">{{redbox}}</span> {{redboxPercent}}</div>
+        <div class="purplebox"><span class="font-bold">{{purplebox}}</span> {{purpleboxPercent}}</div>
+      </div>
+      <div class="tableHeader text-sm">
+        <div class="row">
+          <div class="head1">Zonnamn</div>
+          <div class="head2">Area</div>
+          <div class="head3">Tagit</div>
+        </div>
+      </div>
+      <div class="table text-sm">
+        <div class="row" *ngFor="let zone of zones">
+          <div class="col1" (click)="zoneInListSelected(zone)">{{zone.zoneName}}</div>
+          <div class="col2" (click)="zoneInListSelected(zone)">{{zone.areaName}}</div>
+          <div class="col3" (click)="zoneInListSelected(zone)">{{zone.takes}}</div>
+        </div>
+      </div>
+    </div>
+  </as-split-area>
+<!--  </div>-->
+<!--  <div class="map-container">-->
+  <as-split-area [size]="60" [minSize]="10">
+    <div id="map"></div>
+  </as-split-area>
+<!--  </div>-->
+</as-split>
+<!--</div>-->

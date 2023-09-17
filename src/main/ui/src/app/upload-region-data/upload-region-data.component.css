@@ -1,0 +1,103 @@
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  background: pink;
+/*     border: 1px solid black; */
+}
+
+.box .searching-container {
+  flex: 1 1 auto;
+  /*background: cornflowerblue;*/
+}
+
+.box .map-container {
+  flex: 0 0 60vh;
+  background: lightblue;
+  border: 1px solid black;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+  background: greenyellow;
+}
+
+.row {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.tableHeader {
+  margin-top: 10px;
+}
+
+.table {
+  /*max-height: 150px;*/
+  /*min-height: 5px;*/
+  overflow: auto;
+  margin-bottom: 10px;
+}
+
+
+.head1 {
+  width: 120px;
+  min-width: 120px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  /*background: sandybrown;*/
+}
+
+.head2 {
+  width: 140px;
+  min-width: 140px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  /*background: saddlebrown;*/
+}
+
+.head3 {
+  width: 25px;
+  min-width: 25px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  /*background: rosybrown;*/
+}
+
+.col1 {
+  width: 120px;
+  min-width: 120px;
+  overflow: hidden;
+  margin: 1px 0px;
+  /*background: sandybrown;*/
+}
+
+.col2 {
+  width: 140px;
+  min-width: 140px;
+  overflow: hidden;
+  margin: 1px 0px;
+  /*background: saddlebrown;*/
+}
+
+.col3 {
+  width: 25px;
+  min-width: 25px;
+  overflow: hidden;
+  text-align: right;
+  margin: 1px 0px;
+  /*background: rosybrown;*/
+}
+
+
+.pageHeader {
+  color: #369;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 200%;
+  /* margin-bottom: 10px;
+     background: gold;
+     border: 1px solid black; */
+}
+
