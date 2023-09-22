@@ -30,3 +30,4 @@ target/
 ### Angular ####
 src/main/ui/dist/
 src/main/ui/node_modules/
+src/main/ui/.angular/
