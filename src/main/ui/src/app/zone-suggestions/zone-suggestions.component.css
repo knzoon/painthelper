@@ -160,7 +160,7 @@
 .redbox {
   width: 40px;
   border: 3px solid red;
-  background: red;
+  background: #FF3232;
   padding-top: 3px;
   padding-bottom: 3px;
   text-align: center;
