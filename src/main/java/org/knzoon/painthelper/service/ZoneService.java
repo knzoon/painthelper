@@ -32,6 +32,7 @@ public class ZoneService {
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final TakeoverRepository takeoverRepository;
     private final RoundCalculator roundCalculator;
+    private final PanToCalculator panToCalculator;
 
     private Logger logger = LoggerFactory.getLogger(ZoneService.class);
 
@@ -39,7 +40,7 @@ public class ZoneService {
     public ZoneService(WardedZoneDecorator wardedZoneDecorator, RegionTakesRepository regionTakesRepository,
                        UniqueZoneRepository uniqueZoneRepository, UserRepository userRepository,
                        ZoneRepository zoneRepository, BroadcastMessageRepository broadcastMessageRepository,
-                       TakeoverRepository takeoverRepository, RoundCalculator roundCalculator) {
+                       TakeoverRepository takeoverRepository, RoundCalculator roundCalculator, PanToCalculator panToCalculator) {
         this.wardedZoneDecorator = wardedZoneDecorator;
         this.regionTakesRepository = regionTakesRepository;
         this.uniqueZoneRepository = uniqueZoneRepository;
@@ -48,6 +49,7 @@ public class ZoneService {
         this.broadcastMessageRepository = broadcastMessageRepository;
         this.takeoverRepository = takeoverRepository;
         this.roundCalculator = roundCalculator;
+        this.panToCalculator = panToCalculator;
     }
 
     @Transactional
@@ -131,10 +133,9 @@ public class ZoneService {
             zonesWithTakes = searchUniqueZonesTotally(searchParamsDTO);
         }
 
-        Double lat = averageLatitude(zonesWithTakes);
-        Double lng = averageLongitude(zonesWithTakes);
+        Point panTo = panToCalculator.panTo(zonesWithTakes);
 
-        return new UniqueZoneSearchresultRepresentation(zonesWithTakes, lat, lng);
+        return new UniqueZoneSearchresultRepresentation(zonesWithTakes, panTo.latitude(), panTo.longitude());
     }
 
     private List<UniqueZoneRepresentation> searchUniqueZonesInCurrentRound(ZoneSearchParamsDTO searchParamsDTO) {
@@ -207,30 +208,6 @@ public class ZoneService {
         }
 
         return searchResult.stream().map(this::toRepresentation).collect(Collectors.toList());
-    }
-
-    private Double averageLatitude(List<UniqueZoneRepresentation> zones) {
-//        return 63.807757;
-        return averageDoubleValue(zones.stream().map(UniqueZoneRepresentation::getLatitude).collect(Collectors.toList()));
-    }
-
-    private Double averageLongitude(List<UniqueZoneRepresentation> zones) {
-//        return 20.300605;
-        return averageDoubleValue(zones.stream().map(UniqueZoneRepresentation::getLongitude).collect(Collectors.toList()));
-    }
-
-    private Double averageDoubleValue(List<Double> values) {
-        if (values.isEmpty()) {
-            return 0.0;
-        }
-        if (values.size() == 1) {
-            return values.get(0);
-        }
-
-        Double maxDouble = values.stream().max(Double::compareTo).get();
-        Double minDouble = values.stream().min(Double::compareTo).get();
-        Double avg = (maxDouble + minDouble) / 2;
-        return avg;
     }
 
     private UniqueZoneRepresentation toRepresentation(UniqueZoneView uniqueZone) {
