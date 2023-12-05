@@ -111,7 +111,7 @@
               <label for="minTakes" >Tagen minst:</label>
             </div>
             <div class="col-12">
-              <p-inputNumber inputId="minTakes" [(ngModel)]="minTakes" mode="decimal" [size]="4" [min]="0" [max]="9999" placeholder="0-9999"></p-inputNumber>
+              <p-inputNumber inputId="minTakes" [(ngModel)]="minTakes" mode="decimal" [size]="4" [min]="0" [max]="9999" placeholder="0-9999" (onInput)="handleMinTakesOnInput($event)"></p-inputNumber>
             </div>
           </div>
         </div>
@@ -121,7 +121,7 @@
               <label for="maxTakes" >Tagen max:</label>
             </div>
             <div class="col-12">
-              <p-inputNumber inputId="maxTakes" [(ngModel)]="maxTakes" mode="decimal" [size]="4" [min]="0" [max]="9999" placeholder="0-9999"></p-inputNumber>
+              <p-inputNumber inputId="maxTakes" [(ngModel)]="maxTakes" mode="decimal" [size]="4" [min]="0" [max]="9999" placeholder="0-9999" (onInput)="handleMaxTakesOnInput($event)"></p-inputNumber>
             </div>
           </div>
         </div>
@@ -133,7 +133,7 @@
             </div>
             <div class="grid grid-nogutter">
               <div class="col-12">
-                <p-checkbox [binary]="true" [(ngModel)]="searchRoundOnly" inputId="=onlyRound" ></p-checkbox>
+                <p-checkbox [binary]="true" [(ngModel)]="searchRoundOnly" inputId="=onlyRound" (onChange)="handleSearchOnlyRoundChange()"></p-checkbox>
               </div>
             </div>
           </div>

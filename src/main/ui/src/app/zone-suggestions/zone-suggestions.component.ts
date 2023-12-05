@@ -44,6 +44,9 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   readonly lsUserKey: string = "lastUser";
   readonly lsRegionKey: string = "lastRegion";
   readonly lsAreaKey: string = "lastArea";
+  readonly lsMinTakesKey: string = "minTakes";
+  readonly lsMaxTakesKey: string = "maxTakes";
+  readonly lsSearchRoundOnly: string = "searchRoundOnly";
 
   errorFindingUser?: string = "noUserChosen";
 
@@ -93,6 +96,9 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
     this.testingPopulatingUser();
     this.testingPopulatingRegion();
     this.testingPopulatingArea();
+    this.populatingMinTakesFromLocalstorage();
+    this.populatingMaxTakesFromLocalstorage();
+    this. populatingSearchRoundOnlyFromLocalstorage()
   }
 
   ngAfterViewInit(): void {
@@ -220,6 +226,26 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
     } else {
       console.error('There should be a selected user at this point');
     }
+  }
+
+
+  handleMinTakesOnInput(event: any) {
+    if (event.value) {
+      const jsonData = JSON.stringify(event.value);
+      localStorage.setItem(this.lsMinTakesKey, jsonData);
+    }
+  }
+
+  handleMaxTakesOnInput(event: any) {
+    if (event.value) {
+      const jsonData = JSON.stringify(event.value);
+      localStorage.setItem(this.lsMaxTakesKey, jsonData);
+    }
+  }
+
+  handleSearchOnlyRoundChange() {
+    const jsonData = JSON.stringify(this.searchRoundOnly);
+    localStorage.setItem(this.lsSearchRoundOnly, jsonData);
   }
 
   updateRegions(userName: string) {
@@ -458,6 +484,36 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   }
 
+  populatingMinTakesFromLocalstorage() {
+    const jsonStringFromStorage = localStorage.getItem(this.lsMinTakesKey);
+    console.info('minTakes jsonString from storage:' + jsonStringFromStorage);
+
+    if (jsonStringFromStorage) {
+      let minTakes: number = JSON.parse(jsonStringFromStorage);
+      this.minTakes = minTakes;
+    }
+  }
+
+  populatingMaxTakesFromLocalstorage() {
+    const jsonStringFromStorage = localStorage.getItem(this.lsMaxTakesKey);
+    console.info('minTakes jsonString from storage:' + jsonStringFromStorage);
+
+    if (jsonStringFromStorage) {
+      let maxTakes: number = JSON.parse(jsonStringFromStorage);
+      this.maxTakes = maxTakes;
+    }
+  }
+
+  populatingSearchRoundOnlyFromLocalstorage() {
+    const jsonStringFromStorage = localStorage.getItem(this.lsSearchRoundOnly);
+    console.info('searchRoundOnly jsonString from storage:' + jsonStringFromStorage);
+
+    if (jsonStringFromStorage) {
+      let searchRoundOnly: boolean = JSON.parse(jsonStringFromStorage);
+      this.searchRoundOnly = searchRoundOnly;
+    }
+  }
+
 
   testingErrorHandling() {
     this.zoneService.testingErrorHandling().subscribe(
@@ -470,4 +526,5 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
         this.messageService.add({severity:'error', summary: 'Dörnöö', detail: errorMessage, life: 15000});
       });
   }
+
 }
