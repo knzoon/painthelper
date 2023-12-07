@@ -527,4 +527,8 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
       });
   }
 
+  containsNoTakes(areaLabel: string) : boolean {
+    return areaLabel.indexOf("(0)") > -1;
+  }
+
 }

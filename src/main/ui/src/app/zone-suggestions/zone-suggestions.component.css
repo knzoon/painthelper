@@ -174,3 +174,10 @@
   padding-bottom: 3px;
   text-align: center;
 }
+
+.untakenArea {
+  background: yellow;
+  border: 3px solid red;
+  /*padding-top: 3px;*/
+  /*padding-bottom: 3px;*/
+}

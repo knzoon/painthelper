@@ -145,7 +145,13 @@
               <label for="areaSelect" >Area:</label>
             </div>
             <div class="col-12">
-              <p-dropdown id="areaSelect" [options]="areas" [(ngModel)]="selectedArea" placeholder="Samtliga areor" optionLabel="areaName" [disabled]="areasMissing()" [showClear]="true" (onChange)="chooseArea()"></p-dropdown>
+              <p-dropdown id="areaSelect" [options]="areas" [(ngModel)]="selectedArea" placeholder="Samtliga areor" optionLabel="areaName" [disabled]="areasMissing()" [showClear]="true" (onChange)="chooseArea()">
+                <ng-template let-area pTemplate="item">
+                  <div [class.untakenArea]="containsNoTakes(area.areaName)">
+                    {{ area.areaName }}
+                  </div>
+                </ng-template>
+              </p-dropdown>
             </div>
           </div>
         </div>
