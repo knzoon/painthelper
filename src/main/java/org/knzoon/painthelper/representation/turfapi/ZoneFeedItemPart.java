@@ -2,6 +2,8 @@ package org.knzoon.painthelper.representation.turfapi;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.knzoon.painthelper.model.ValidationException;
+import org.knzoon.painthelper.model.Zone;
 
 import java.time.ZonedDateTime;
 
@@ -126,4 +128,21 @@ public class ZoneFeedItemPart {
     public void setTakeoverPoints(Integer takeoverPoints) {
         this.takeoverPoints = takeoverPoints;
     }
+
+    public boolean equalsExistingZone(Zone zoneFromDB) {
+        if (zoneFromDB == null || !zoneFromDB.getId().equals(id)) {
+            throw new ValidationException("Zone comparison done wrong");
+        }
+
+        return zoneNameEqual(zoneFromDB) && coordinatesEqual(zoneFromDB);
+    }
+
+    private boolean zoneNameEqual(Zone zoneFromDB) {
+        return zoneFromDB.getName().equals(name);
+    }
+
+    private boolean coordinatesEqual(Zone zoneFromDB) {
+        return zoneFromDB.getLatitude().equals(latitude) && zoneFromDB.getLongitude().equals(longitude);
+    }
+
 }

@@ -93,26 +93,11 @@ public class FeedItem {
     }
 
     public boolean equalsExistingZone(Zone zoneFromDB) {
-        if (someOfComparedZonesAreNull(zoneFromDB) || zoneIdNotEqual(zoneFromDB)) {
+        if (zone == null) {
             throw new ValidationException("Zone comparison done wrong");
         }
 
-        return zoneNameEqual(zoneFromDB) && coordinatesEqual(zoneFromDB);
+        return zone.equalsExistingZone(zoneFromDB);
     }
 
-    private boolean zoneNameEqual(Zone zoneFromDB) {
-        return zoneFromDB.getName().equals(zone.getName());
-    }
-
-    private boolean coordinatesEqual(Zone zoneFromDB) {
-        return zoneFromDB.getLatitude().equals(zone.getLatitude()) && zoneFromDB.getLongitude().equals(zone.getLongitude());
-    }
-
-    private boolean someOfComparedZonesAreNull(Zone zoneFromDB) {
-        return zoneFromDB == null || zone == null;
-    }
-
-    private boolean zoneIdNotEqual(Zone zoneFromDB) {
-        return !zoneFromDB.getId().equals(zone.getId());
-    }
 }

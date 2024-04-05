@@ -1,26 +1,10 @@
 package org.knzoon.painthelper.service;
 
-import org.knzoon.painthelper.model.ErrorTakeover;
-import org.knzoon.painthelper.model.ErrorTakeoverRepository;
-import org.knzoon.painthelper.model.FeedInfo;
-import org.knzoon.painthelper.model.FeedInfoRepository;
-import org.knzoon.painthelper.model.FeedReadInfo;
-import org.knzoon.painthelper.model.FeedReadInfoRepository;
-import org.knzoon.painthelper.model.RegionTakes;
-import org.knzoon.painthelper.model.RegionTakesRepository;
-import org.knzoon.painthelper.model.Takeover;
-import org.knzoon.painthelper.model.TakeoverRepository;
-import org.knzoon.painthelper.model.TakeoverType;
-import org.knzoon.painthelper.model.UniqueZone;
-import org.knzoon.painthelper.model.UniqueZoneRepository;
-import org.knzoon.painthelper.model.User;
-import org.knzoon.painthelper.model.UserIdView;
-import org.knzoon.painthelper.model.UserRepository;
-import org.knzoon.painthelper.model.Zone;
-import org.knzoon.painthelper.model.ZoneInfo;
-import org.knzoon.painthelper.model.ZoneRepository;
-import org.knzoon.painthelper.model.ZoneUpdated;
-import org.knzoon.painthelper.model.ZoneUpdatedRepository;
+import org.knzoon.painthelper.model.*;
+import org.knzoon.painthelper.model.feed.ImportFeedResult;
+import org.knzoon.painthelper.model.feed.ImportFeedResultTotal;
+import org.knzoon.painthelper.representation.feed.FeedReadResultRepresentation;
+import org.knzoon.painthelper.representation.feed.SingleFeedImportResultRepresentation;
 import org.knzoon.painthelper.representation.turfapi.FeedItem;
 import org.knzoon.painthelper.representation.turfapi.UserMinimal;
 import org.knzoon.painthelper.representation.turfapi.ZoneFeedItemPart;
@@ -33,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -59,6 +40,7 @@ public class FeedService {
     private final RoundCalculator roundCalculator;
     private final ErrorTakeoverRepository errorTakeoverRepository;
 
+    private final TakeoverFeedImporter takeoverFeedImporter;
 
     private Logger logger = LoggerFactory.getLogger(FeedService.class);
 
@@ -66,7 +48,7 @@ public class FeedService {
     public FeedService(TurfApiEndpoint turfApiEndpoint, FeedInfoRepository feedInfoRepository, FeedReadInfoRepository feedReadInfoRepository,
                        UserRepository userRepository, RegionTakesRepository regionTakesRepository, UniqueZoneRepository uniqueZoneRepository,
                        ZoneRepository zoneRepository, ZoneUpdatedRepository zoneUpdatedRepository, TakeoverRepository takeoverRepository,
-                       RoundCalculator roundCalculator, ErrorTakeoverRepository errorTakeoverRepository) {
+                       RoundCalculator roundCalculator, ErrorTakeoverRepository errorTakeoverRepository, TakeoverFeedImporter takeoverFeedImporter) {
         this.turfApiEndpoint = turfApiEndpoint;
         this.feedInfoRepository = feedInfoRepository;
         this.feedReadInfoRepository = feedReadInfoRepository;
@@ -78,6 +60,7 @@ public class FeedService {
         this.takeoverRepository = takeoverRepository;
         this.roundCalculator = roundCalculator;
         this.errorTakeoverRepository = errorTakeoverRepository;
+        this.takeoverFeedImporter = takeoverFeedImporter;
     }
 
     @Transactional
@@ -348,4 +331,44 @@ public class FeedService {
                 zoneFromApi.getRegionId(), zoneFromApi.getRegionName(), zoneFromApi.getAreaId(), zoneFromApi.getAreaName(),
                 zoneFromApi.getCountryCode());
     }
+
+    public FeedReadResultRepresentation readFromInternalFeed() {
+        ImportFeedResultTotal importFeedResultTotal = new ImportFeedResultTotal();
+        ImportFeedResult currentImportFeedResult;
+//        logger.info("started feed read");
+        int testdrive = 0;
+
+        UUID lastReadFeedItemId = takeoverFeedImporter.findLastReadFeedItemId();
+
+        do {
+            testdrive++;
+            currentImportFeedResult = takeoverFeedImporter.importFeedFrom(lastReadFeedItemId);
+
+            importFeedResultTotal.addImportFeedResult(currentImportFeedResult);
+
+            lastReadFeedItemId = currentImportFeedResult.getLastReadFeedItemId().orElse(lastReadFeedItemId);
+//            logger.info("Time spent for feed {}: {}", testdrive, currentImportFeedResult.timeSpent());
+
+//        } while (currentImportFeedResult.feedItemsRead());
+        } while (testdrive < 5 && currentImportFeedResult.hasFeedItemsBeenRead());
+
+//        logger.info("finished feed read");
+
+        List<SingleFeedImportResultRepresentation> feedImportResultRepresentations = importFeedResultTotal.getImportFeedResults()
+                .stream()
+                .map(this::toRepresentation).collect(Collectors.toList());
+        return new FeedReadResultRepresentation(importFeedResultTotal.getNumberOfFeedsReads(),
+                importFeedResultTotal.totalTakeoversCreated(),
+                importFeedResultTotal.totalUniqueZonesUpdated(),
+                importFeedResultTotal.totalTimeSpent().toString(),
+                feedImportResultRepresentations);
+    }
+
+    private SingleFeedImportResultRepresentation toRepresentation(ImportFeedResult importFeedResult) {
+        return new SingleFeedImportResultRepresentation(importFeedResult.feedItemsRead(),
+                importFeedResult.takeoversCreated(),
+                importFeedResult.uniqueZonesUpdated(),
+                importFeedResult.timeSpent().toString());
+    }
+
 }
