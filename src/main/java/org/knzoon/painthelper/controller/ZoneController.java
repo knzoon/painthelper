@@ -2,6 +2,8 @@ package org.knzoon.painthelper.controller;
 
 import org.knzoon.painthelper.model.dto.ZoneSearchParamsDTO;
 import org.knzoon.painthelper.representation.*;
+import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
+import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
 import org.knzoon.painthelper.service.ZoneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,6 @@ public class ZoneController {
         return searchresult;
     }
 
-//    @CrossOrigin(origins = {"http://localhost:4200", "http://91.226.221.195:8080"})
     @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/api/regiontakes")
     public List<RegionTakesRepresentation> getRegionTakes(@RequestParam(value = "username") String username) {
@@ -54,7 +55,6 @@ public class ZoneController {
         return regionTakes;
     }
 
-//    @CrossOrigin(origins = {"http://localhost:4200", "http://91.226.221.195:8080"})
     @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/api/areas")
     public List<AreaRepresentation> getDistinctAreasForRegionTakes(@RequestParam(value = "regionTakesId") Long regionTakesId) {
@@ -67,12 +67,16 @@ public class ZoneController {
         return areas;
     }
 
-//    @CrossOrigin(origins = {"http://localhost:4200", "http://91.226.221.195:8080"})
     @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/api/users")
     public List<UserRepresentation> searchUsers(@RequestParam(value = "searchString") String searchString) {
-        List<UserRepresentation> users = zoneService.searchUsers(searchString);
-        return users;
+        return zoneService.searchUsers(searchString);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/api/allusers")
+    public List<UserRepresentation> searchAllUsers(@RequestParam(value = "searchString") String searchString) {
+        return zoneService.searchAllUsers(searchString);
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
@@ -85,6 +89,12 @@ public class ZoneController {
     @GetMapping("/api/turfeffort")
     public TurfEffortRepresentation getTurfEffortForUser(@RequestParam(value = "username") String username) {
         return zoneService.getTurfEffortForUserAndCurrentRound(username);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/api/cumulative")
+    public GraphDatasetRepresentation getGraphdataCumulative(@RequestParam(value = "username") String username) {
+        return zoneService.getGraphdataCumulative(username);
     }
 
     @GetMapping("/api/testing")

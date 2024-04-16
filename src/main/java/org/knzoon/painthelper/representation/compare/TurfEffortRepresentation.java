@@ -1,4 +1,4 @@
-package org.knzoon.painthelper.representation;
+package org.knzoon.painthelper.representation.compare;
 
 public class TurfEffortRepresentation {
     private final String username;

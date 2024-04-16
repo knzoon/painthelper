@@ -3,6 +3,7 @@ package org.knzoon.painthelper.service;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -59,4 +60,11 @@ public class RoundCalculator {
         int dayOfWeekForFirstInMonth = firstDayOfMonthOfThisRound.getDayOfWeek().getValue();
         return firstDayOfMonthOfThisRound.plusDays(7 - dayOfWeekForFirstInMonth);
     }
+
+    Integer dayOfRound(Integer roundId, ZonedDateTime takeovertime) {
+        ZonedDateTime noonStartDate = starttimeForRound(roundId).with(ChronoField.HOUR_OF_DAY, MIDDAY_HOUR).with(ChronoField.MINUTE_OF_HOUR, MIDDAY_MINUTE);
+        ZonedDateTime noonEndDate = takeovertime.with(ChronoField.HOUR_OF_DAY, MIDDAY_HOUR).with(ChronoField.MINUTE_OF_HOUR, MIDDAY_MINUTE);
+        return (int) Duration.between(noonStartDate, noonEndDate).toDays() + 1;
+    }
+
 }
