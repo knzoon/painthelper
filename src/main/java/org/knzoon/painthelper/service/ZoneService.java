@@ -418,7 +418,7 @@ public class ZoneService {
 
     private String calculateTimeSpentInRoutes(List<Route> routes) {
         Duration totalDuration = routes.stream().map(Route::timeSpent).reduce(Duration.ZERO, Duration::plus);
-        return totalDuration.toHours() + " timmar och " + totalDuration.toMinutesPart() + " minuter";
+        return totalDuration.toHours() + "h " + totalDuration.toMinutesPart() + "m";
     }
 
     private Integer calculatePointsForTakeovers(List<Takeover> takeovers) {
