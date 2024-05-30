@@ -3,6 +3,8 @@ package org.knzoon.painthelper.service;
 import org.knzoon.painthelper.model.FeedInfo;
 import org.knzoon.painthelper.model.dto.WardedDataDTO;
 import org.knzoon.painthelper.representation.turfapi.FeedItem;
+import org.knzoon.painthelper.representation.turfapi.IdParameter;
+import org.knzoon.painthelper.representation.turfapi.UserInfoFromTurfApi;
 import org.knzoon.painthelper.representation.turfapi.UserMinimal;
 import org.knzoon.painthelper.representation.turfapi.ZoneFeedItemPart;
 import org.knzoon.painthelper.representation.turfapi.ZoneMinimal;
@@ -14,6 +16,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -28,6 +31,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -95,6 +99,31 @@ public class TurfApiEndpoint {
         return fetchedUsers.get(0).getId();
     }
 
+    public List<UserInfoFromTurfApi> getUserInfo(List<IdParameter> users) {
+        final String baseUrl = "https://api.turfgame.com/unstable/users";
+        URI uri = null;
+
+        try {
+            uri = new URI(baseUrl);
+        } catch (URISyntaxException e) {
+            // TODO implement better error handling
+            return List.of();
+        }
+
+        HttpEntity<List<IdParameter>> request = new HttpEntity<>(users, getHttpHeaders());
+        logger.info("Trying to call turf api");
+        ResponseEntity<List<UserInfoFromTurfApi>> result = restTemplate.exchange(uri, HttpMethod.POST, request, new ParameterizedTypeReference<List<UserInfoFromTurfApi>>() {});
+
+        if (result.getStatusCode().isError()) {
+            logger.info("Errorcode is {}", result.getStatusCode().value());
+
+            String userIdListString = users.stream().map(IdParameter::getId).map(Objects::toString).collect(Collectors.joining());
+            logger.info("List of userId: {}", userIdListString);
+            return List.of();
+        }
+
+        return result.getBody();
+    }
 
 
     public List<FeedItem> readFeed(FeedInfo feedInfo) {
