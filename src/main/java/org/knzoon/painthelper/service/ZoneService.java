@@ -494,6 +494,7 @@ public class ZoneService {
         if (takeovers == null || takeovers.isEmpty()) {
             return 0.0;
         }
+//        takeovers.stream().forEach(takeover -> logger.info("Takeovertime: {} Points: {}", takeover.getTakeoverTime(), takeover.pointsUntilNow(now)));
 
         return takeovers.stream().map(t -> t.pointsUntilNow(now)).collect(Collectors.summingDouble(Double::doubleValue));
 

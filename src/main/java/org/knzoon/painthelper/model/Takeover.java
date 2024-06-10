@@ -190,19 +190,18 @@ public class Takeover {
 
     /// Copied from LeagueHelper
     public Double pointsUntilNow(ZonedDateTime now) {
-        // Four cases
-        // 1 Neutral zone
-        // 2 Revisit
-        // 3 Assist
-        // 4 Regular zone
+        // Five cases
+        // 1 Neutral zone takeover
+        // 2 Neutral zone assist
+        // 3 Revisit
+        // 4 Assist
+        // 5 Regular takeover
 
         if (isNeutralZone()) {
 //            logger.info("tp: {}, pphPart: {}, 50, sum: {}", tp, pphPart(now),  tp + pphPart(now) + 50);
             return tp + pphPart(now) + 50;
         } else if (isRevisit()) {
             return tp / 2.0;
-        } else if (type == TakeoverType.ASSIST) {
-            return (double) tp;
         }
 
         return tp + pphPart(now);
@@ -218,6 +217,10 @@ public class Takeover {
     }
 
     Double pphPart(ZonedDateTime now) {
+        if (type == TakeoverType.ASSIST) {
+            return 0.0;
+        }
+
         ZonedDateTime endTime = this.lostTime == null ? calculateEndTime(now) : this.lostTime;
         Duration duration = Duration.between(this.takeoverTime, endTime);
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YY-MM-dd HH:mm:ss");
