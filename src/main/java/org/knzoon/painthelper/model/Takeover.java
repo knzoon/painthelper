@@ -216,7 +216,7 @@ public class Takeover {
         return user.equals(previousUser);
     }
 
-    Double pphPart(ZonedDateTime now) {
+    public Double pphPart(ZonedDateTime now) {
         if (type == TakeoverType.ASSIST) {
             return 0.0;
         }

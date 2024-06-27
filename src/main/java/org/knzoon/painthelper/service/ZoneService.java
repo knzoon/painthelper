@@ -411,9 +411,17 @@ public class ZoneService {
             routes.add(currentRoute);
         }
 
+        ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
         List<Route> filteredRoutes = routes.stream().filter(Route::hasMoreThanOneTake).collect(Collectors.toList());
 
-        return new TurfEffortRepresentation(username, calculateTimeSpentInRoutes(filteredRoutes), calculatePointsForTakeovers(takeovers), takeovers.size(), filteredRoutes.size(), getTakesInRoutes(filteredRoutes));
+        return new TurfEffortRepresentation(
+                username,
+                calculateTimeSpentInRoutes(filteredRoutes),
+                calculatePointsForTakeovers(takeovers, now),
+                takeovers.size(),
+                filteredRoutes.size(),
+                getTakesInRoutes(filteredRoutes),
+                calculatePphForTakeovers(takeovers, now));
     }
 
     private String calculateTimeSpentInRoutes(List<Route> routes) {
@@ -421,9 +429,13 @@ public class ZoneService {
         return totalDuration.toHours() + "h " + totalDuration.toMinutesPart() + "m";
     }
 
-    private Integer calculatePointsForTakeovers(List<Takeover> takeovers) {
-        ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
+    private Integer calculatePointsForTakeovers(List<Takeover> takeovers, ZonedDateTime now) {
         Double points = takeovers.stream().map(t -> t.pointsUntilNow(now)).collect(Collectors.summingDouble(Double::doubleValue));
+        return (int) Math.round(points);
+    }
+
+    private Integer calculatePphForTakeovers(List<Takeover> takeovers, ZonedDateTime now) {
+        Double points = takeovers.stream().map(t -> t.pphPart(now)).collect(Collectors.summingDouble(Double::doubleValue));
         return (int) Math.round(points);
     }
 
