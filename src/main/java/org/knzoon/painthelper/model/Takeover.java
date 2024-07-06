@@ -217,7 +217,7 @@ public class Takeover {
     }
 
     public Double pphPart(ZonedDateTime now) {
-        if (type == TakeoverType.ASSIST) {
+        if (type == TakeoverType.ASSIST || isRevisit()) {
             return 0.0;
         }
 
