@@ -8,6 +8,7 @@ import org.knzoon.painthelper.model.dto.RegionTakesDTO;
 import org.knzoon.painthelper.model.dto.WardedDataDTO;
 import org.knzoon.painthelper.model.dto.ZoneSearchParamsDTO;
 import org.knzoon.painthelper.representation.*;
+import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatapointRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
 import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
@@ -443,22 +444,31 @@ public class ZoneService {
         return routes.stream().map(Route::nrofTakes).reduce(0, Integer::sum);
     }
 
-    @Transactional
-    public GraphDatasetRepresentation getGraphdataCumulative(String username) {
+    public GraphDataRepresentation getGraphData(String username) {
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
-            return new GraphDatasetRepresentation("unknown", List.of());
+            return GraphDataRepresentation.tom();
         }
 
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
+        List<Double> pointsPerDay = generateListOfPointsPerDayThisFarInCurrentRound(user, now);
+
+        return new GraphDataRepresentation(getGraphdataCumulative(pointsPerDay, username), GraphDatasetRepresentation.tom());
+    }
+
+    private List<Double> generateListOfPointsPerDayThisFarInCurrentRound(User user, ZonedDateTime now) {
         Integer roundId = roundCalculator.roundFromDateTime(now);
         Integer currentDayOfRound = roundCalculator.dayOfRound(roundId, now);
         List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
 
-        List<Integer> pointsPerDay = calculatePointsCumulative(takeovers, now, currentDayOfRound);
+        return calculatePointsPerDay(takeovers, now, currentDayOfRound);
+    }
 
-        return new GraphDatasetRepresentation(username, toDatapointRepresentationList(pointsPerDay));
+    private GraphDatasetRepresentation getGraphdataCumulative(List<Double> pointsPerDay, String username) {
+        List<Integer> cumulativePointsPerDay = calculatePointsCumulative(pointsPerDay);
+
+        return new GraphDatasetRepresentation(username, toDatapointRepresentationList(cumulativePointsPerDay));
     }
 
     private List<GraphDatapointRepresentation> toDatapointRepresentationList(List<Integer> pointsPerDay) {
@@ -472,8 +482,7 @@ public class ZoneService {
         return representationList;
     }
 
-    private List<Integer> calculatePointsCumulative(List<Takeover> takeovers, ZonedDateTime now, int numberOfDaysInRoundYet) {
-        List<Double> pointsPerDay = calculatePointsPerDay(takeovers, now, numberOfDaysInRoundYet);
+    private List<Integer> calculatePointsCumulative(List<Double> pointsPerDay) {
         List<Integer> cumulativePoints = new ArrayList<>();
 
         Double partialSum = 0.0;

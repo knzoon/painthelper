@@ -11,6 +11,10 @@ public class GraphDatasetRepresentation {
         this.data = data;
     }
 
+    public static GraphDatasetRepresentation tom() {
+        return new GraphDatasetRepresentation("unknown", List.of());
+    }
+
     public String getLabel() {
         return label;
     }

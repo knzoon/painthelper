@@ -101,7 +101,7 @@ public class ZoneController {
     @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/api/cumulative")
     public GraphDatasetRepresentation getGraphdataCumulative(@RequestParam(value = "username") String username) {
-        return zoneService.getGraphdataCumulative(username);
+        return zoneService.getGraphData(username).getCumulative();
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
