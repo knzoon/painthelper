@@ -18,7 +18,8 @@ public class RoundCalculator {
     private static final int MIDDAY_MINUTE = 0;
     private static final ZonedDateTime FIRST_DAY_OF_MONTH_FIRST_ROUND = ZonedDateTime.of(LocalDateTime.of(2010, 7, 1, MIDDAY_HOUR, MIDDAY_MINUTE), ZoneId.of("Europe/Stockholm"));
 
-    int roundFromDateTime(ZonedDateTime dateTime) {
+    // TODO RoundCalculator can't be part of service package since it is needed from Takeover
+    public int roundFromDateTime(ZonedDateTime dateTime) {
         ZonedDateTime dateTimeSwe = dateTime.withZoneSameInstant(ZoneId.of("Europe/Stockholm"));
 
         int yearsAfterStart = dateTimeSwe.getYear() - CALCULATOR_STARTYEAR;
