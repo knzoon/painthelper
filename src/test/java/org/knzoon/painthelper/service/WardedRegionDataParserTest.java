@@ -29,5 +29,11 @@ class WardedRegionDataParserTest {
         assertThat(endOfData).isEqualTo("    }");
     }
 
+    @Test
+    public void canParseUsername() {
+        WardedRegionDataParser parser = new WardedRegionDataParser();
+        String username = parser.parseUsername(8, "        <button class=\"dropbtn\">praktikus            <i class=\"dropbtnarrow\"></i>");
+        assertThat(username).isEqualTo("praktikus");
+    }
 
 }

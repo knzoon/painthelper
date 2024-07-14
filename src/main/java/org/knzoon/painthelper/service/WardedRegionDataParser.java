@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 public class WardedRegionDataParser {
 
     Logger logger = LoggerFactory.getLogger(WardedRegionDataParser.class);
-    private final static String USERNAME_SEARCHPATTERN = "/turf/user.php";
+    private final static String USERNAME_SEARCHPATTERN = "<button class=\"dropbtn\">";
     private final static String DATA_START_SEARCHPATTERN = "\"type\": \"FeatureCollection\"";
     private final static String DATA_END_SEARCHPATTERN = "},";
 
@@ -37,11 +37,7 @@ public class WardedRegionDataParser {
                     int searchpatternFoundAtIndex = line.indexOf(USERNAME_SEARCHPATTERN);
 
                     if (searchpatternFoundAtIndex != -1) {
-                        String afterSearchPattern = line.substring(searchpatternFoundAtIndex + USERNAME_SEARCHPATTERN.length());
-                        int indexOfOpeningGt = afterSearchPattern.indexOf(">");
-                        String usernameAndTheRest = afterSearchPattern.substring(indexOfOpeningGt + 1);
-                        int indexOfClosingLt = usernameAndTheRest.indexOf("<");
-                        username = usernameAndTheRest.substring(0, indexOfClosingLt);
+                        username = parseUsername(searchpatternFoundAtIndex, line);
 
                         searchingForUsername = false;
                         searchingForStartOfData = true;
@@ -87,6 +83,13 @@ public class WardedRegionDataParser {
         } catch (Exception e) {
             throw new ValidationException("Filen du försökt importera från innehåller fel", e);
         }
+    }
+
+    String parseUsername(int searchpatternFoundAtIndex, String line) {
+        String afterSearchPattern = line.substring(searchpatternFoundAtIndex + USERNAME_SEARCHPATTERN.length());
+        int indexOfClosingLt = afterSearchPattern.indexOf("<");
+        String usernameUntrimmed = afterSearchPattern.substring(0, indexOfClosingLt);
+        return usernameUntrimmed.trim();
     }
 
     private boolean missingValues(String username, StringBuilder theActualData) {

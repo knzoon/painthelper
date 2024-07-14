@@ -245,8 +245,12 @@ public class FeedService {
         ZoneFeedItemPart zoneFromApi = feedItem.getZone();
         Optional<Zone> zoneInDB = zoneRepository.findById(zoneFromApi.getId());
         if (!zoneInDB.isPresent()) {
-            zoneRepository.save(createZone(zoneFromApi));
-            logger.info("Imported zone: {}, {} from feed", zoneFromApi.getName(), zoneFromApi.getRegionName());
+            try {
+                zoneRepository.save(createZone(zoneFromApi));
+                logger.info("Imported zone: {}, {} from feed", zoneFromApi.getName(), zoneFromApi.getRegionName());
+            } catch (Exception e) {
+                logger.error("failed to save zone {}, {}", zoneFromApi.getName(), zoneFromApi.getRegion());
+            }
         }
     }
 
