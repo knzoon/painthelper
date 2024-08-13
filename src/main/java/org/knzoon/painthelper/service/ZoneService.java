@@ -468,8 +468,17 @@ public class ZoneService {
     private GraphDatasetRepresentation getGraphdataCumulative(List<Double> pointsPerDay, String username) {
         List<Integer> cumulativePointsPerDay = calculatePointsCumulative(pointsPerDay);
 
-        return new GraphDatasetRepresentation(username, toDatapointRepresentationList(cumulativePointsPerDay));
+        return new GraphDatasetRepresentation(username, toDatapointRepresentationList(cumulativePointsPerDay), getTotalPoints(cumulativePointsPerDay));
     }
+
+    private Integer getTotalPoints(List<Integer> cumulativePointsPerDay) {
+        if (cumulativePointsPerDay.isEmpty()) {
+            return 0;
+        }
+
+        return cumulativePointsPerDay.get(cumulativePointsPerDay.size() - 1);
+    }
+
 
     private List<GraphDatapointRepresentation> toDatapointRepresentationList(List<Integer> pointsPerDay) {
         List<GraphDatapointRepresentation> representationList = new ArrayList<>();
