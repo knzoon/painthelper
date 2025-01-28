@@ -47,7 +47,7 @@ public class TurfApiEndpoint {
 
     public List<ZoneFeedItemPart> fetchZonesFromTurfApi(List<String> zoneNames) {
 
-        final String baseUrl = "https://api.turfgame.com/unstable/zones";
+        final String baseUrl = "https://api.turfgame.com/v5/zones";
         URI uri = null;
 
         try {
@@ -78,7 +78,7 @@ public class TurfApiEndpoint {
     }
 
     public Long getUserId(WardedDataDTO wardedDataDTO) {
-        final String baseUrl = "https://api.turfgame.com/unstable/users";
+        final String baseUrl = "https://api.turfgame.com/v5/users";
         URI uri = null;
 
         try {
@@ -100,7 +100,7 @@ public class TurfApiEndpoint {
     }
 
     public List<UserInfoFromTurfApi> getUserInfo(List<IdParameter> users) {
-        final String baseUrl = "https://api.turfgame.com/unstable/users";
+        final String baseUrl = "https://api.turfgame.com/v5/users";
         URI uri = null;
 
         try {
@@ -128,7 +128,7 @@ public class TurfApiEndpoint {
 
     public List<FeedItem> readFeed(FeedInfo feedInfo) {
         String dateTimeStr = feedInfo.getLatestFeedItemRead().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
-        String baseUrl = "https://api.turfgame.com/unstable/feeds/" + feedInfo.getFeedName();
+        String baseUrl = "https://api.turfgame.com/v5/feeds/" + feedInfo.getFeedName();
         String uriString = null;
         URI uri = null;
 
@@ -158,7 +158,7 @@ public class TurfApiEndpoint {
     }
 
     public List<ZoneFeedItemPart> getAllZones() {
-        String baseUrl = "https://api.turfgame.com/unstable/zones/all";
+        String baseUrl = "https://api.turfgame.com/v5/zones/all";
         URI uri = null;
 
         try {

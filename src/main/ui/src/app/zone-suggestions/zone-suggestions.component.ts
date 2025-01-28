@@ -276,7 +276,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
     if (this.selectedUser) {
       this.zoneService.getBroadcastMessages(this.selectedUser.id).subscribe((messages: BroadcastMessage[]) => {
         if (messages.length > 0) {
-          this.messageService.add({severity:'error', summary: 'Viktig information', detail: messages[0].message, life: 15000});
+          this.messageService.add({severity:'error', summary: 'Viktig information', detail: messages[0].message, life: 45000});
         }
       });
     }

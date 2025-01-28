@@ -1,5 +1,8 @@
 package org.knzoon.painthelper.representation.warded;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ZoneProperties {
 
     private String title;
