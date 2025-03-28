@@ -1,7 +1,7 @@
 package org.knzoon.painthelper.infrastructure;
 
 import org.knzoon.painthelper.model.FeedInfo;
-import org.knzoon.painthelper.representation.feed.FeedReadResultRepresentation;
+import org.knzoon.painthelper.model.feed.ImportFeedResultTotal;
 import org.knzoon.painthelper.service.FeedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +20,19 @@ public class ScheduledTasks {
         this.feedService = feedService;
     }
 
-    @Scheduled(fixedDelay = 15000)
+    @Scheduled(fixedDelay = 60000)
     public void readTakeoverFeed() {
-        FeedReadResultRepresentation result = feedService.readFromInternalFeed();
-        if (result.totalFeeditemsRead() > 0) {
-            logger.info("imported zones: {} timespent: {} ", result.totalFeeditemsRead(), result.getTotalTimeSpent());
+        ImportFeedResultTotal result = feedService.readTakeoversFromFeedBackup();
+        if (result.anyFeedItemsRead()) {
+            logger.info("Total imported takeovers: {} timespent: {} ", result.totalFeeditemsRead(), result.totalTimeSpentAsString());
         }
     }
 
     @Scheduled(fixedRate = 303333)
     public void readZoneFeed() {
-        feedService.readFeedAndImportData(FeedInfo.ZONE_FEED);
+        ImportFeedResultTotal result = feedService.readZonesFromFeedBackup();
+        if (result.anyFeedItemsRead()) {
+            logger.info("Total imported takeovers: {} timespent: {} ", result.totalFeeditemsRead(), result.totalTimeSpentAsString());
+        }
     }
 }

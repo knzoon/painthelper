@@ -295,10 +295,16 @@ public class ZoneService {
 
     @Transactional
     public List<AreaRepresentation> getDistinctAreasForRegionTakes(Long regionTakesId) {
+        Optional<RegionTakes> regionTakesFromDB = regionTakesRepository.findById(regionTakesId);
+
+        if (regionTakesFromDB.isEmpty()) {
+            return List.of();
+        }
+
         List<AreaView> areasWithTakenZones = uniqueZoneRepository.findDistinctAreasByTakenAndRegionTakesId(regionTakesId);
         Map<Long, AreaView> mappedTakenAreas = areasWithTakenZones.stream().collect(Collectors.toMap(AreaView::getAreaId, Function.identity()));
 
-        RegionTakes regionTakes = regionTakesRepository.findById(regionTakesId).get();
+        RegionTakes regionTakes = regionTakesFromDB.get();
         List<AreaView> distinctAreasByRegionId = zoneRepository.findDistinctAreasByRegionId(regionTakes.getRegionId());
 
         List<AreaView> areasWithoutTakenZones = distinctAreasByRegionId.stream().filter(areaView -> hasNoTakenZones(areaView, mappedTakenAreas)).collect(Collectors.toList());

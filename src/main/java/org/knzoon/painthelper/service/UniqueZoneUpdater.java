@@ -8,7 +8,6 @@ import org.knzoon.painthelper.model.UniqueZone;
 import org.knzoon.painthelper.model.UniqueZoneRepository;
 import org.knzoon.painthelper.model.UserIdView;
 import org.knzoon.painthelper.model.ZoneInfo;
-import org.knzoon.painthelper.model.feed.ImprovedFeedItem;
 import org.knzoon.painthelper.representation.turfapi.FeedItem;
 import org.knzoon.painthelper.representation.turfapi.ZoneFeedItemPart;
 import org.slf4j.Logger;
@@ -39,8 +38,7 @@ public class UniqueZoneUpdater {
         this.errorTakeoverRepository = errorTakeoverRepository;
     }
 
-    public int updateUniqueZones(ImprovedFeedItem improvedFeedItem, Map<Long, Long> importedUsers) {
-        FeedItem feedItem = improvedFeedItem.takeoverAsFeedItem();
+    public int updateUniqueZones(FeedItem feedItem, Map<Long, Long> importedUsers) {
         List<Long> allUserIdInvolved = feedItem.getAllUserIdInvolved();
         Long regionId = feedItem.getRegionId();
         ZoneFeedItemPart zone = feedItem.getZone();

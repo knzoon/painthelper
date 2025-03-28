@@ -5,7 +5,6 @@ import org.knzoon.painthelper.model.TakeoverRepository;
 import org.knzoon.painthelper.model.TakeoverType;
 import org.knzoon.painthelper.model.User;
 import org.knzoon.painthelper.model.UserRepository;
-import org.knzoon.painthelper.model.feed.ImprovedFeedItem;
 import org.knzoon.painthelper.representation.turfapi.FeedItem;
 import org.knzoon.painthelper.representation.turfapi.UserMinimal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +28,7 @@ public class TakeoverCreator {
         this.roundCalculator = roundCalculator;
     }
 
-    public int saveTakeovers(ImprovedFeedItem improvedFeedItem) {
-        FeedItem feedItem = improvedFeedItem.takeoverAsFeedItem();
+    public int saveTakeovers(FeedItem feedItem) {
         User takeoverUser = getOrCreateUser(feedItem.getTakeoverUser());
         List<User> assistingUsers = getAssistingUsers(feedItem);
         User previousUser = getPreviousUser(feedItem);

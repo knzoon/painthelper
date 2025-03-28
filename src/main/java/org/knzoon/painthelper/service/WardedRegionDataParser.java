@@ -18,18 +18,17 @@ public class WardedRegionDataParser {
 
     Logger logger = LoggerFactory.getLogger(WardedRegionDataParser.class);
     private final static String USERNAME_SEARCHPATTERN = "<button class=\"dropbtn\">";
-    private final static String DATA_START_SEARCHPATTERN = "\"type\": \"FeatureCollection\"";
-    private final static String DATA_END_SEARCHPATTERN = "},";
+    private final static String DATA_START_SEARCHPATTERN = "\"type\":\"FeatureCollection\"";
+    private final static String PRE_ACTUAL_DATA = "data: ";
 
     public WardedDataDTO parse(MultipartFile file) {
         try {
             String username = null;
 
-            StringBuilder theActualData = new StringBuilder();
+            String theActualData = "";
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
             boolean searchingForUsername = true;
             boolean searchingForStartOfData = false;
-            boolean insideData = false;
             String line = bufferedReader.readLine();
             while (line != null) {
 
@@ -39,6 +38,7 @@ public class WardedRegionDataParser {
                     if (searchpatternFoundAtIndex != -1) {
                         username = parseUsername(searchpatternFoundAtIndex, line);
 
+                        logger.info("found username {}", username);
                         searchingForUsername = false;
                         searchingForStartOfData = true;
                     }
@@ -46,20 +46,10 @@ public class WardedRegionDataParser {
                     int searchpatternFoundAtIndex = line.indexOf(DATA_START_SEARCHPATTERN);
 
                     if (searchpatternFoundAtIndex != -1) {
-                        theActualData.append("{\n");
-                        theActualData.append(line);
+                        logger.info("found start of data");
+                        theActualData = parseActualData(line);
                         searchingForStartOfData = false;
-                        insideData = true;
                     }
-                } else if (insideData) {
-
-                    if (line.equals(DATA_END_SEARCHPATTERN)) {
-                        theActualData.append("}");
-                        insideData = false;
-                    } else {
-                        theActualData.append(line);
-                    }
-
                 } else {
                     // throw away the rest
                 }
@@ -76,7 +66,7 @@ public class WardedRegionDataParser {
             logger.info("Current username: {}", username);
 
             ObjectMapper objectMapper = new ObjectMapper();
-            UniqueWardedZones uniqueWardedZones = objectMapper.readValue(theActualData.toString(), UniqueWardedZones.class);
+            UniqueWardedZones uniqueWardedZones = objectMapper.readValue(theActualData, UniqueWardedZones.class);
 
             return new WardedDataDTO(uniqueWardedZones, username);
 
@@ -92,9 +82,14 @@ public class WardedRegionDataParser {
         return usernameUntrimmed.trim();
     }
 
-    private boolean missingValues(String username, StringBuilder theActualData) {
+    String parseActualData(String line) {
+        return line.substring(line.indexOf(PRE_ACTUAL_DATA) + PRE_ACTUAL_DATA.length());
+    }
+
+
+    private boolean missingValues(String username, String theActualData) {
         boolean noUserName = username == null;
-        boolean noData = theActualData.length() == 0;
+        boolean noData = theActualData.isEmpty();
 
         return noUserName || noData;
     }

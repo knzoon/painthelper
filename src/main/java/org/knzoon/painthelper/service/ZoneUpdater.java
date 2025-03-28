@@ -6,7 +6,6 @@ import org.knzoon.painthelper.model.Zone;
 import org.knzoon.painthelper.model.ZoneRepository;
 import org.knzoon.painthelper.model.ZoneUpdated;
 import org.knzoon.painthelper.model.ZoneUpdatedRepository;
-import org.knzoon.painthelper.model.feed.ImprovedFeedItem;
 import org.knzoon.painthelper.representation.turfapi.FeedItem;
 import org.knzoon.painthelper.representation.turfapi.ZoneFeedItemPart;
 import org.slf4j.Logger;
@@ -37,8 +36,8 @@ public class ZoneUpdater {
         this.zoneUpdatedRepository = zoneUpdatedRepository;
     }
 
-    public void handlePossibleUpdatedZone(ImprovedFeedItem improvedFeedItem) {
-        ZoneFeedItemPart zonefromFeed = improvedFeedItem.takeoverAsFeedItem().getZone();
+    public void handlePossibleUpdatedZone(FeedItem feedItem) {
+        ZoneFeedItemPart zonefromFeed = feedItem.getZone();
         Optional<Zone> possibleZoneFromDB = zoneRepository.findById(zonefromFeed.getId());
 
         if (possibleZoneFromDB.isPresent()) {
@@ -69,4 +68,21 @@ public class ZoneUpdater {
                 zoneFromApi.getCountryCode());
     }
 
+    private void saveZone(ZoneFeedItemPart zoneFromApi) {
+        try {
+            zoneRepository.save(createZone(zoneFromApi));
+            logger.info("Imported zone: {}, {} from feed", zoneFromApi.getName(), zoneFromApi.getRegionName());
+        } catch (Exception e) {
+            logger.error("failed to save zone {}, {}", zoneFromApi.getName(), zoneFromApi.getRegion());
+        }
+    }
+
+    public void saveZoneIfNew(FeedItem feedItem) {
+        ZoneFeedItemPart zonefromFeed = feedItem.getZone();
+        Optional<Zone> possibleZoneFromDB = zoneRepository.findById(zonefromFeed.getId());
+        if (possibleZoneFromDB.isEmpty()) {
+            saveZone(zonefromFeed);
+        }
+
+    }
 }

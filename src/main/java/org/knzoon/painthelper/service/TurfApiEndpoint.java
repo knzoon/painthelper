@@ -126,37 +126,6 @@ public class TurfApiEndpoint {
     }
 
 
-    public List<FeedItem> readFeed(FeedInfo feedInfo) {
-        String dateTimeStr = feedInfo.getLatestFeedItemRead().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
-        String baseUrl = "https://api.turfgame.com/v5/feeds/" + feedInfo.getFeedName();
-        String uriString = null;
-        URI uri = null;
-
-        try {
-            uriString = UriComponentsBuilder.fromHttpUrl(baseUrl).queryParam("afterDate", URLEncoder.encode(dateTimeStr, "UTF-8")).build().toUriString();
-//            logger.info("uriString: {}", uriString);
-        } catch (UnsupportedEncodingException e) {
-            return Collections.emptyList();
-        }
-
-        try {
-            uri = new URI(uriString);
-        } catch (URISyntaxException e) {
-            return Collections.emptyList();
-        }
-
-
-        HttpEntity<?> entity = new HttpEntity<>(getHttpHeaders());
-
-        ResponseEntity<List<FeedItem>> result = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<FeedItem>>() {});
-
-        List<FeedItem> feed = result.getBody();
-//        logger.info("Status från api-anrop {} ", result.getStatusCode());
-//        logger.info("Antal feedItems från api: {}", feed.size());
-
-        return feed;
-    }
-
     public List<ZoneFeedItemPart> getAllZones() {
         String baseUrl = "https://api.turfgame.com/v5/zones/all";
         URI uri = null;

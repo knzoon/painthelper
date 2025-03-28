@@ -34,4 +34,20 @@ public class ImportFeedResultTotal {
     public Integer totalUniqueZonesUpdated() {
         return importFeedResults.stream().map(ImportFeedResult::uniqueZonesUpdated).reduce(0, Integer::sum);
     }
+
+    public boolean anyFeedItemsRead() {
+        return !importFeedResults.isEmpty() && importFeedResults.get(0).hasFeedItemsBeenRead();
+    }
+
+    public Integer totalFeeditemsRead() {
+        if (importFeedResults.isEmpty()) {
+            return 0;
+        }
+
+        return importFeedResults.stream().map(ImportFeedResult::feedItemsRead).reduce(0, Integer::sum);
+    }
+
+    public String totalTimeSpentAsString() {
+        return totalTimeSpent().toString();
+    }
 }

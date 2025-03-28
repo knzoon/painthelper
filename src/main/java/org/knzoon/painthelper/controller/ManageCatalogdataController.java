@@ -1,8 +1,6 @@
 package org.knzoon.painthelper.controller;
 
 import org.knzoon.painthelper.representation.ImportResultRepresentation;
-import org.knzoon.painthelper.representation.feed.FeedReadResultRepresentation;
-import org.knzoon.painthelper.representation.feed.ImprovedFeedItemRepresentation;
 import org.knzoon.painthelper.service.FeedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +23,4 @@ public class ManageCatalogdataController {
         return new ImportResultRepresentation("Import av Zoner", nrofImported);
     }
 
-    @GetMapping("/api/testFeedRead")
-    public FeedReadResultRepresentation testFeedRead() {
-        return feedService.readFromInternalFeed();
-    }
 }
