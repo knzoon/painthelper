@@ -96,7 +96,7 @@ public class FeedService {
         try {
             Thread.sleep(2000L);
         } catch (InterruptedException e) {
-            //do nothing
+            Thread.currentThread().interrupt();
         }
     }
 

@@ -61,7 +61,7 @@ public class FeedbackupEndpoint {
 
         List<FeedItem> feed = result.getBody();
 //        logger.info("Status från api-anrop {} ", result.getStatusCode());
-        logger.info("Antal feedItems från api: {}", feed.size());
+//        logger.info("Antal feedItems av typ {} från api: {}", feedInfo.getFeedName(), feed.size());
 
         return feed;
     }

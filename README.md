@@ -10,6 +10,7 @@ Docker is needing a `.env` file
 ```
 DB_ROOT_PASSWD=yourSecretPasswordForDBRoot
 DB_USER_PASSWD=yourSecretPasswordForDBUser
+FEED_READ_DISABLE=false
 ```
 
 Maven is needing environment variables in the shell

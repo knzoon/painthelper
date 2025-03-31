@@ -71,7 +71,7 @@ public class ZoneUpdater {
     private void saveZone(ZoneFeedItemPart zoneFromApi) {
         try {
             zoneRepository.save(createZone(zoneFromApi));
-            logger.info("Imported zone: {}, {} from feed", zoneFromApi.getName(), zoneFromApi.getRegionName());
+//            logger.info("Imported zone: {}, {} from feed", zoneFromApi.getName(), zoneFromApi.getRegionName());
         } catch (Exception e) {
             logger.error("failed to save zone {}, {}", zoneFromApi.getName(), zoneFromApi.getRegion());
         }

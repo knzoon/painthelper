@@ -6,6 +6,7 @@ services:
     environment:
       DB_USER_PASSWD: ${DB_USER_PASSWD}
       DB_CONNECTION_STRING: jdbc:mariadb://database:3306/knzoon
+      FEED_READ_DISABLE: ${FEED_READ_DISABLE}
     depends_on:
       database:
         condition: service_healthy

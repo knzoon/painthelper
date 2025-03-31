@@ -6,6 +6,7 @@ import org.knzoon.painthelper.service.FeedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,9 @@ public class ScheduledTasks {
     private Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
     private final FeedService feedService;
 
+    @Value("${feed.read.disable:false}")
+    private String disableFeedread;
+
     @Autowired
     public ScheduledTasks(FeedService feedService) {
         this.feedService = feedService;
@@ -22,17 +26,29 @@ public class ScheduledTasks {
 
     @Scheduled(fixedDelay = 60000)
     public void readTakeoverFeed() {
-        ImportFeedResultTotal result = feedService.readTakeoversFromFeedBackup();
-        if (result.anyFeedItemsRead()) {
-            logger.info("Total imported takeovers: {} timespent: {} ", result.totalFeeditemsRead(), result.totalTimeSpentAsString());
+        if (readingFeedIsDisabled()) {
+            logger.info("skipping takeover feed read due to env var {}", disableFeedread);
+        } else {
+            ImportFeedResultTotal result = feedService.readTakeoversFromFeedBackup();
+            if (result.anyFeedItemsRead()) {
+                logger.info("Total imported takeovers: {} timespent: {} ", result.totalFeeditemsRead(), result.totalTimeSpentAsString());
+            }
         }
+    }
+
+    private boolean readingFeedIsDisabled() {
+        return disableFeedread != null && disableFeedread.equals("true");
     }
 
     @Scheduled(fixedRate = 303333)
     public void readZoneFeed() {
-        ImportFeedResultTotal result = feedService.readZonesFromFeedBackup();
-        if (result.anyFeedItemsRead()) {
-            logger.info("Total imported takeovers: {} timespent: {} ", result.totalFeeditemsRead(), result.totalTimeSpentAsString());
+        if (readingFeedIsDisabled()) {
+            logger.info("skipping zone feed read due to env var {}", disableFeedread);
+        } else {
+            ImportFeedResultTotal result = feedService.readZonesFromFeedBackup();
+            if (result.anyFeedItemsRead()) {
+                logger.info("Total imported takeovers: {} timespent: {} ", result.totalFeeditemsRead(), result.totalTimeSpentAsString());
+            }
         }
     }
 }
