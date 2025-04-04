@@ -88,6 +88,7 @@ public class FeedService {
 
     private ImportFeedResult readOneTakeoverFeed() {
         FeedInfo feedInfo = takeoverFeedImporter.getFeedOrCreateIfNeccecery();
+//        logger.info("Latest feed item read from DB {}", feedInfo.getLatestFeedItemRead());
         List<FeedItem> allFeedItems = feedbackupEndpoint.readFeed(feedInfo);
         return takeoverFeedImporter.importFeedItems(allFeedItems);
     }

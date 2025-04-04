@@ -31,7 +31,7 @@ public class ZoneFeedImporter {
         FeedInfo feedInfo = feedInfoRepository.findByFeedName(FeedInfo.ZONE_FEED);
 
         if (feedInfo == null) {
-            feedInfo = new FeedInfo(FeedInfo.TAKEOVER_FEED);
+            feedInfo = new FeedInfo(FeedInfo.ZONE_FEED);
             feedInfoRepository.save(feedInfo);
         }
 
@@ -63,7 +63,7 @@ public class ZoneFeedImporter {
 
 
     private void updateLastReadFeedItemId(ZonedDateTime takeovertimeOfLastFeedItem) {
-        FeedInfo feedInfo = feedInfoRepository.findByFeedName(FeedInfo.TAKEOVER_FEED);
+        FeedInfo feedInfo = feedInfoRepository.findByFeedName(FeedInfo.ZONE_FEED);
         feedInfo.setLatestFeedItemRead(takeovertimeOfLastFeedItem);
     }
 

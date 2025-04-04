@@ -82,6 +82,7 @@ public class TakeoverFeedImporter {
 
     private void updateLastReadFeedItemId(ZonedDateTime takeovertimeOfLastFeedItem) {
         FeedInfo feedInfo = feedInfoRepository.findByFeedName(FeedInfo.TAKEOVER_FEED);
+//        logger.info("Takeovertime of last feed item {}", takeovertimeOfLastFeedItem);
         feedInfo.setLatestFeedItemRead(takeovertimeOfLastFeedItem);
     }
 
