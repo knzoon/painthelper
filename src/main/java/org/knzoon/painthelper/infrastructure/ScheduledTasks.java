@@ -24,7 +24,7 @@ public class ScheduledTasks {
         this.feedService = feedService;
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 60000, initialDelay = 10000)
     public void readTakeoverFeed() {
         if (readingFeedIsDisabled()) {
             logger.info("skipping takeover feed read due to env var {}", disableFeedread);
@@ -40,7 +40,7 @@ public class ScheduledTasks {
         return disableFeedread != null && disableFeedread.equals("true");
     }
 
-    @Scheduled(fixedRate = 303333)
+    @Scheduled(fixedDelay = 300000, initialDelay = 20000)
     public void readZoneFeed() {
         if (readingFeedIsDisabled()) {
             logger.info("skipping zone feed read due to env var {}", disableFeedread);
