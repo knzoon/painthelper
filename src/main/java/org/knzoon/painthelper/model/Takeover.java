@@ -189,7 +189,7 @@ public class Takeover {
     }
 
     /// Copied from LeagueHelper
-    public Double pointsUntilNow(ZonedDateTime now) {
+    public PointsInDay pointsUntilNow(ZonedDateTime now) {
         // Five cases
         // 1 Neutral zone takeover
         // 2 Neutral zone assist
@@ -199,12 +199,12 @@ public class Takeover {
 
         if (isNeutralZone()) {
 //            logger.info("tp: {}, pphPart: {}, 50, sum: {}", tp, pphPart(now),  tp + pphPart(now) + 50);
-            return tp + pphPart(now) + 50;
+            return new PointsInDay(tp + pphPart(now) + 50, tp.doubleValue(), pphPart(now) + 50);
         } else if (isRevisit()) {
-            return tp / 2.0;
+            return new PointsInDay(tp / 2.0, tp/2.0, 0.0);
         }
 
-        return tp + pphPart(now);
+        return new PointsInDay(tp + pphPart(now), tp.doubleValue(), pphPart(now));
 
     }
 

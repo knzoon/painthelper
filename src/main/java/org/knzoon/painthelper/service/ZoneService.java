@@ -8,6 +8,7 @@ import org.knzoon.painthelper.model.dto.RegionTakesDTO;
 import org.knzoon.painthelper.model.dto.WardedDataDTO;
 import org.knzoon.painthelper.model.dto.ZoneSearchParamsDTO;
 import org.knzoon.painthelper.representation.*;
+import org.knzoon.painthelper.representation.compare.DailyGraphDatasetRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatapointRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
@@ -421,14 +422,16 @@ public class ZoneService {
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
         List<Route> filteredRoutes = routes.stream().filter(Route::hasMoreThanOneTake).collect(Collectors.toList());
 
+        List<PointsInDay> pointsPerDay = takeovers.stream().map(t -> t.pointsUntilNow(now)).collect(Collectors.toList());
+
         return new TurfEffortRepresentation(
                 username,
                 calculateTimeSpentInRoutes(filteredRoutes),
-                calculatePointsForTakeovers(takeovers, now),
+                calculatePointsForTakeovers(pointsPerDay),
                 takeovers.size(),
                 filteredRoutes.size(),
                 getTakesInRoutes(filteredRoutes),
-                calculatePphForTakeovers(takeovers, now));
+                calculatePphForTakeovers(pointsPerDay));
     }
 
     private String calculateTimeSpentInRoutes(List<Route> routes) {
@@ -436,13 +439,13 @@ public class ZoneService {
         return totalDuration.toHours() + "h " + totalDuration.toMinutesPart() + "m";
     }
 
-    private Integer calculatePointsForTakeovers(List<Takeover> takeovers, ZonedDateTime now) {
-        Double points = takeovers.stream().map(t -> t.pointsUntilNow(now)).collect(Collectors.summingDouble(Double::doubleValue));
+    private Integer calculatePointsForTakeovers(List<PointsInDay> pointsPerDay) {
+        Double points = pointsPerDay.stream().map(PointsInDay::getTotal).collect(Collectors.summingDouble(Double::doubleValue));
         return (int) Math.round(points);
     }
 
-    private Integer calculatePphForTakeovers(List<Takeover> takeovers, ZonedDateTime now) {
-        Double points = takeovers.stream().map(t -> t.pphPart(now)).collect(Collectors.summingDouble(Double::doubleValue));
+    private Integer calculatePphForTakeovers(List<PointsInDay> pointsPerDay) {
+        Double points = pointsPerDay.stream().map(PointsInDay::getPph).collect(Collectors.summingDouble(Double::doubleValue));
         return (int) Math.round(points);
     }
 
@@ -450,6 +453,7 @@ public class ZoneService {
         return routes.stream().map(Route::nrofTakes).reduce(0, Integer::sum);
     }
 
+    @Transactional
     public GraphDataRepresentation getGraphData(String username) {
         User user = userRepository.findByUsername(username);
 
@@ -458,33 +462,30 @@ public class ZoneService {
         }
 
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
-        List<Double> pointsPerDay = generateListOfPointsPerDayThisFarInCurrentRound(user, now);
+        PointsInRound pointsPerDay = generateListOfPointsPerDayThisFarInCurrentRound(user, now);
 
-        return new GraphDataRepresentation(getGraphdataCumulative(pointsPerDay, username), GraphDatasetRepresentation.tom());
+        GraphDatasetRepresentation graphdataCumulative = getGraphdataCumulative(pointsPerDay);
+        List<DailyGraphDatasetRepresentation> graphdataDaily = getGraphdataDaily(pointsPerDay);
+
+        return new GraphDataRepresentation(graphdataCumulative, graphdataDaily);
     }
 
-    private List<Double> generateListOfPointsPerDayThisFarInCurrentRound(User user, ZonedDateTime now) {
+    private PointsInRound generateListOfPointsPerDayThisFarInCurrentRound(User user, ZonedDateTime now) {
         Integer roundId = roundCalculator.roundFromDateTime(now);
         Integer currentDayOfRound = roundCalculator.dayOfRound(roundId, now);
         List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
 
-        return calculatePointsPerDay(takeovers, now, currentDayOfRound);
+        return calculatePointsPerDay(takeovers, now, currentDayOfRound, user.getUsername());
     }
 
-    private GraphDatasetRepresentation getGraphdataCumulative(List<Double> pointsPerDay, String username) {
-        List<Integer> cumulativePointsPerDay = calculatePointsCumulative(pointsPerDay);
+    private GraphDatasetRepresentation getGraphdataCumulative(PointsInRound pointsInRound) {
+        List<Integer> cumulativePointsPerDay = pointsInRound.calculatePointsCumulative();
 
-        return new GraphDatasetRepresentation(username, toDatapointRepresentationList(cumulativePointsPerDay), getTotalPoints(cumulativePointsPerDay));
+        return new GraphDatasetRepresentation(
+                pointsInRound.getUsername(),
+                toDatapointRepresentationList(cumulativePointsPerDay),
+                pointsInRound.getPointsTotalSum());
     }
-
-    private Integer getTotalPoints(List<Integer> cumulativePointsPerDay) {
-        if (cumulativePointsPerDay.isEmpty()) {
-            return 0;
-        }
-
-        return cumulativePointsPerDay.get(cumulativePointsPerDay.size() - 1);
-    }
-
 
     private List<GraphDatapointRepresentation> toDatapointRepresentationList(List<Integer> pointsPerDay) {
         List<GraphDatapointRepresentation> representationList = new ArrayList<>();
@@ -497,51 +498,41 @@ public class ZoneService {
         return representationList;
     }
 
-    private List<Integer> calculatePointsCumulative(List<Double> pointsPerDay) {
-        List<Integer> cumulativePoints = new ArrayList<>();
+    private List<DailyGraphDatasetRepresentation> getGraphdataDaily(PointsInRound pointsPerDay) {
+        String username = pointsPerDay.getUsername();
+        Integer pointsTotalSum = pointsPerDay.getPointsTotalSum();
 
-        Double partialSum = 0.0;
+        var takepointDataset = DailyGraphDatasetRepresentation.takepointDataset(
+                username,
+                pointsPerDay.dailyTakeoverPoints(),
+                pointsTotalSum);
 
-        for (Double dayPoints : pointsPerDay) {
-            partialSum += dayPoints;
-            cumulativePoints.add((int) Math.round(partialSum));
-        }
+        var pphDataset = DailyGraphDatasetRepresentation.pphDataset(
+                username,
+                pointsPerDay.dailyPphPoints(),
+                pointsTotalSum);
 
-//        pointsPerDay.forEach(d -> logger.info("per day {}", d));
-//        cumulativePoints.forEach(i -> logger.info("per day rounded {}", i));
-
-        return cumulativePoints;
+        return List.of(takepointDataset, pphDataset);
     }
 
-    private List<Double> calculatePointsPerDay(List<Takeover> takeovers, ZonedDateTime now, int numberOfDaysInRoundYet) {
-        List<Double> pointsPerDay = new ArrayList<>();
+    private PointsInRound calculatePointsPerDay(List<Takeover> takeovers, ZonedDateTime now, int numberOfDaysInRoundYet, String username) {
+        PointsInRound pointsInRound = new PointsInRound(username);
 
         Map<Integer, List<Takeover>> takeoversPerDay = takeovers.stream().collect(Collectors.groupingBy(t -> roundCalculator.dayOfRound(t.getRoundId(), t.getTakeoverTime())));
 
         for (int i = 1; i < numberOfDaysInRoundYet + 1; i++) {
-//            logger.info("Day {}", i);
-            pointsPerDay.add(calculatePointsForDay(takeoversPerDay.get(i), now));
+            pointsInRound.addDay(summPointsForDay(takeoversPerDay.get(i), now));
         }
 
-        return pointsPerDay;
+        return pointsInRound;
     }
 
-    private Double calculatePointsForDay(List<Takeover> takeovers, ZonedDateTime now) {
-        if (takeovers == null || takeovers.isEmpty()) {
-            return 0.0;
+    private PointsInDay summPointsForDay(List<Takeover> takeovers, ZonedDateTime now) {
+        if (takeovers == null) {
+            return PointsInDay.ZERO;
         }
-//        takeovers.stream().forEach(takeover -> logger.info("Takeovertime: {} Points: {}", takeover.getTakeoverTime(), takeover.pointsUntilNow(now)));
 
-        return takeovers.stream().map(t -> t.pointsUntilNow(now)).collect(Collectors.summingDouble(Double::doubleValue));
-
-//        int roundedSum = (int) Math.round(sum);
-//
-//        logger.info("Sum: {}, {}", roundedSum, sum);
-
+        return takeovers.stream().map(t -> t.pointsUntilNow(now)).reduce(PointsInDay.ZERO, PointsInDay::add);
     }
-
-
-
-
 
 }

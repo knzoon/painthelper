@@ -1,10 +1,12 @@
 package org.knzoon.painthelper.representation.compare;
 
+import java.util.List;
+
 public class GraphDataRepresentation {
     private final GraphDatasetRepresentation cumulative;
-    private final GraphDatasetRepresentation daily;
+    private final List<DailyGraphDatasetRepresentation> daily;
 
-    public GraphDataRepresentation(GraphDatasetRepresentation cumulative, GraphDatasetRepresentation daily) {
+    public GraphDataRepresentation(GraphDatasetRepresentation cumulative, List<DailyGraphDatasetRepresentation> daily) {
         this.cumulative = cumulative;
         this.daily = daily;
     }
@@ -17,7 +19,7 @@ public class GraphDataRepresentation {
         return cumulative;
     }
 
-    public GraphDatasetRepresentation getDaily() {
+    public List<DailyGraphDatasetRepresentation> getDaily() {
         return daily;
     }
 }

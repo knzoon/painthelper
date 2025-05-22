@@ -79,7 +79,7 @@ public class FeedService {
         do {
             currentImportFeedResult = readOneTakeoverFeed();
             importFeedResultTotal.addImportFeedResult(currentImportFeedResult);
-            logger.info("Imported zones: {} timespent: {} ", currentImportFeedResult.feedItemsRead(), currentImportFeedResult.timeSpent());
+            logger.info("Imported takeovers: {} timespent: {} ", currentImportFeedResult.feedItemsRead(), currentImportFeedResult.timeSpent());
             sleep();
         } while (currentImportFeedResult.feedItemsRead() > 950);
 

@@ -2,6 +2,7 @@ package org.knzoon.painthelper.controller;
 
 import org.knzoon.painthelper.model.dto.ZoneSearchParamsDTO;
 import org.knzoon.painthelper.representation.*;
+import org.knzoon.painthelper.representation.compare.DailyGraphDatasetRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
 import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
 import org.knzoon.painthelper.representation.turfapi.IdParameter;
@@ -102,6 +103,12 @@ public class ZoneController {
     @GetMapping("/api/cumulative")
     public GraphDatasetRepresentation getGraphdataCumulative(@RequestParam(value = "username") String username) {
         return zoneService.getGraphData(username).getCumulative();
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/api/daily")
+    public List<DailyGraphDatasetRepresentation> getGraphdataDaily(@RequestParam(value = "username") String username) {
+        return zoneService.getGraphData(username).getDaily();
     }
 
     @CrossOrigin(origins = "http://localhost:4200")

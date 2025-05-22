@@ -47,7 +47,7 @@ public class ScheduledTasks {
         } else {
             ImportFeedResultTotal result = feedService.readZonesFromFeedBackup();
             if (result.anyFeedItemsRead()) {
-                logger.info("Total imported takeovers: {} timespent: {} ", result.totalFeeditemsRead(), result.totalTimeSpentAsString());
+                logger.info("Total imported zones: {} timespent: {} ", result.totalFeeditemsRead(), result.totalTimeSpentAsString());
             }
         }
     }

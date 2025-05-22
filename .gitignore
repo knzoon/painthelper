@@ -27,6 +27,7 @@ target/
 ### misc ###
 *.log
 .env
+build_local.sh
 
 ### Angular ####
 src/main/ui/dist/

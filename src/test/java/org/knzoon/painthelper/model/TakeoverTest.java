@@ -37,28 +37,43 @@ class TakeoverTest {
     @Test
     void points_after_an_hour_neutral_zone_takeover() {
         Takeover takeover = new Takeover(currentRound, TakeoverType.TAKEOVER, 31342L, null, takeoverTime, userA, 9, 65, null, null);
-        assertThat(takeover.pointsUntilNow(nowAsDateTime)).isBetween(123.8, 124.2);
+        PointsInDay pointsInDay = takeover.pointsUntilNow(nowAsDateTime);
+        assertThat(pointsInDay.getTotal()).isBetween(123.8, 124.2);
+        assertThat(pointsInDay.getTakepoint()).isBetween(65.0, 65.0);
+        assertThat(pointsInDay.getPph()).isBetween(58.8, 59.2);
     }
 
     @Test
     void points_after_an_hour_neutral_zone_assist() {
         Takeover takeover = new Takeover(currentRound, TakeoverType.ASSIST, 31342L, null, takeoverTime, userA, 9, 65, null, userB);
-        assertThat(takeover.pointsUntilNow(nowAsDateTime)).isBetween(115.0, 115.0);
+        PointsInDay pointsInDay = takeover.pointsUntilNow(nowAsDateTime);
+        assertThat(pointsInDay.getTotal()).isBetween(115.0, 115.0);
+        assertThat(pointsInDay.getTakepoint()).isBetween(65.0, 65.0);
+        assertThat(pointsInDay.getPph()).isBetween(50.0, 50.0);
     }
     @Test
     void points_after_an_hour_revisit() {
         Takeover takeover = new Takeover(currentRound, TakeoverType.TAKEOVER, 31342L, null, takeoverTime, userA, 9, 65, userA, null);
-        assertThat(takeover.pointsUntilNow(nowAsDateTime)).isBetween(32.3, 32.7);
+        PointsInDay pointsInDay = takeover.pointsUntilNow(nowAsDateTime);
+        assertThat(pointsInDay.getTotal()).isBetween(32.3, 32.7);
+        assertThat(pointsInDay.getTakepoint()).isBetween(32.3, 32.7);
+        assertThat(pointsInDay.getPph()).isBetween(0.0, 0.0);
     }
     @Test
     void points_after_an_hour_assist() {
         Takeover takeover = new Takeover(currentRound, TakeoverType.ASSIST, 31342L, null, takeoverTime, userA, 9, 65, userB, userB);
-        assertThat(takeover.pointsUntilNow(nowAsDateTime)).isBetween(65.0, 65.0);
+        PointsInDay pointsInDay = takeover.pointsUntilNow(nowAsDateTime);
+        assertThat(pointsInDay.getTotal()).isBetween(65.0, 65.0);
+        assertThat(pointsInDay.getTakepoint()).isBetween(65.0, 65.0);
+        assertThat(pointsInDay.getPph()).isBetween(0.0, 0.0);
     }
     @Test
     void points_after_an_hour_takeover() {
         Takeover takeover = new Takeover(currentRound, TakeoverType.TAKEOVER, 31342L, null, takeoverTime, userA, 9, 65, userB, null);
-        assertThat(takeover.pointsUntilNow(nowAsDateTime)).isBetween(73.8, 74.2);
+        PointsInDay pointsInDay = takeover.pointsUntilNow(nowAsDateTime);
+        assertThat(pointsInDay.getTotal()).isBetween(73.8, 74.2);
+        assertThat(pointsInDay.getTakepoint()).isBetween(65.0, 65.0);
+        assertThat(pointsInDay.getPph()).isBetween(8.8, 9.2);
     }
 
 
