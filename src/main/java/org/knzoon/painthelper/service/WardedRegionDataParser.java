@@ -19,7 +19,8 @@ public class WardedRegionDataParser {
     Logger logger = LoggerFactory.getLogger(WardedRegionDataParser.class);
     private final static String USERNAME_SEARCHPATTERN = "<button class=\"dropbtn\">";
     private final static String DATA_START_SEARCHPATTERN = "\"type\":\"FeatureCollection\"";
-    private final static String PRE_ACTUAL_DATA = "data: ";
+    private final static String PRE_ACTUAL_DATA = "unique\":{\"type\":\"geojson\",\"data\":";
+    private final static String POST_ACTUAL_DATA = "}}]}";
 
     public WardedDataDTO parse(MultipartFile file) {
         try {
@@ -71,6 +72,7 @@ public class WardedRegionDataParser {
             return new WardedDataDTO(uniqueWardedZones, username);
 
         } catch (Exception e) {
+            logger.error("oväntat fel i parsning: {}", e);
             throw new ValidationException("Filen du försökt importera från innehåller fel", e);
         }
     }
@@ -83,7 +85,9 @@ public class WardedRegionDataParser {
     }
 
     String parseActualData(String line) {
-        return line.substring(line.indexOf(PRE_ACTUAL_DATA) + PRE_ACTUAL_DATA.length());
+        String leftTrimmed = line.substring(line.indexOf(PRE_ACTUAL_DATA) + PRE_ACTUAL_DATA.length());
+        String rightTrimmed = leftTrimmed.substring(0, leftTrimmed.indexOf(POST_ACTUAL_DATA) + POST_ACTUAL_DATA.length());
+        return rightTrimmed;
     }
 
 
