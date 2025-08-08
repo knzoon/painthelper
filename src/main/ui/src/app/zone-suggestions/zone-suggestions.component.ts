@@ -142,7 +142,8 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
         icon: numberIcon
       });
 
-      marker.bindPopup(z.zoneName).openPopup();
+      let popupContent: string = "<p style='font-size: 2em'><b>" + z.zoneName + "</b><br/>Tagen <b>" + z.takes + "</b> gånger</p>";
+      marker.bindPopup(popupContent).openPopup();
 
       this.layerGroup.addLayer(marker);
     }
