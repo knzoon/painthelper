@@ -21,3 +21,9 @@ $ export export DB_CONNECTION_STRING=jdbc:mariadb://localhost:3306/knzoon
 ```
 The connection string should point to a test instance of db.
 Only used for tests while building jar
+
+If you want to configure to read feeds from locolhost you can add this line in the `.env` file
+
+```
+FEED_READ_BASEURL=http://localhost:8000/feed/
+```

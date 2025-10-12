@@ -4,6 +4,7 @@ import org.knzoon.painthelper.model.FeedInfo;
 import org.knzoon.painthelper.representation.turfapi.FeedItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,8 @@ public class FeedbackupEndpoint {
 
     private final RestTemplate restTemplate;
 
+    @Value("${feed.read.baseurl:https://feed.knzoon.se/feed/}")
+    private String baseURL;
 
     public FeedbackupEndpoint() {
         this.restTemplate = new RestTemplate();
@@ -36,13 +39,13 @@ public class FeedbackupEndpoint {
     public List<FeedItem> readFeed(FeedInfo feedInfo) {
         String dateTimeStr = feedInfo.getLatestFeedItemRead().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
 //        logger.info("dateTimeStr: {}", dateTimeStr);
-        String baseUrl = "https://feed.knzoon.se/feed/" + feedInfo.getFeedName();
-//        String baseUrl = "http://localhost:8000/feed/" + feedInfo.getFeedName();
+        String feedURL = getBaseURL() + feedInfo.getFeedName();
+        logger.info("baseURl:  {}", feedURL);
         String uriString;
         URI uri;
 
         try {
-            uriString = UriComponentsBuilder.fromHttpUrl(baseUrl).queryParam("after", URLEncoder.encode(dateTimeStr, "UTF-8")).build().toUriString();
+            uriString = UriComponentsBuilder.fromHttpUrl(feedURL).queryParam("after", URLEncoder.encode(dateTimeStr, "UTF-8")).build().toUriString();
 //            logger.info("uriString: {}", uriString);
         } catch (UnsupportedEncodingException e) {
             return Collections.emptyList();
@@ -64,6 +67,10 @@ public class FeedbackupEndpoint {
 //        logger.info("Antal feedItems av typ {} från api: {}", feedInfo.getFeedName(), feed.size());
 
         return feed;
+    }
+
+    private String getBaseURL() {
+        return baseURL != null && !baseURL.trim().isEmpty()? baseURL : "https://feed.knzoon.se/feed/";
     }
 
     private HttpHeaders getHttpHeaders() {
