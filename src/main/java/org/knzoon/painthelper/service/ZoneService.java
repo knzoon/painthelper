@@ -535,4 +535,10 @@ public class ZoneService {
         return takeovers.stream().map(t -> t.pointsUntilNow(now)).reduce(PointsInDay.ZERO, PointsInDay::add);
     }
 
+    @Transactional
+    public LatestTakeoverInfoRepresentation getLatestTakeover() {
+        Takeover latestTakeover = takeoverRepository.findLatestTakeover();
+        return new LatestTakeoverInfoRepresentation(latestTakeover.getZoneId(), latestTakeover.getTakeoverTime());
+    }
+
 }

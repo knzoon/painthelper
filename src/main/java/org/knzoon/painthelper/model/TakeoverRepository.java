@@ -33,6 +33,7 @@ public interface TakeoverRepository extends JpaRepository<Takeover, Long> {
 
     List<Takeover> findAllByRoundIdAndUserOrderById(Integer roundId, User user);
 
-
+    @Query(value = "SELECT * FROM takeover ORDER BY id desc limit 1", nativeQuery = true)
+    Takeover findLatestTakeover();
 
 }

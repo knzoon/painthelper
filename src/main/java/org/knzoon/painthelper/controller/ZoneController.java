@@ -112,6 +112,13 @@ public class ZoneController {
         return userService.getUserInfo(users);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/api/takeover/latest")
+    public LatestTakeoverInfoRepresentation getLatestTakeover() {
+        return zoneService.getLatestTakeover();
+    }
+
+
     @GetMapping("/api/testing")
     public List<UniqueZoneRepresentation> testing() {
         return zoneService.testing();
