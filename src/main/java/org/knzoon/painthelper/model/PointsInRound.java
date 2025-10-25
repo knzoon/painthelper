@@ -22,6 +22,10 @@ public class PointsInRound {
         points.add(pointsInDay);
     }
 
+    public List<PointsInDay> getPointsInDay() {
+        return points;
+    }
+
     public List<Integer> calculatePointsCumulative() {
         List<Integer> cumulativePoints = new ArrayList<>();
 

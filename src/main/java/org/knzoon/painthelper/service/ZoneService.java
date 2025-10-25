@@ -12,6 +12,7 @@ import org.knzoon.painthelper.representation.compare.DailyGraphDatasetRepresenta
 import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatapointRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
+import org.knzoon.painthelper.representation.compare.TakeoverSummaryDayRepresentation;
 import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -462,12 +463,13 @@ public class ZoneService {
         }
 
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
-        PointsInRound pointsPerDay = generateListOfPointsPerDayThisFarInCurrentRound(user, now);
+        PointsInRound pointsInRound = generateListOfPointsPerDayThisFarInCurrentRound(user, now);
 
-        GraphDatasetRepresentation graphdataCumulative = getGraphdataCumulative(pointsPerDay);
-        List<DailyGraphDatasetRepresentation> graphdataDaily = getGraphdataDaily(pointsPerDay);
+        GraphDatasetRepresentation graphdataCumulative = getGraphdataCumulative(pointsInRound);
+        List<DailyGraphDatasetRepresentation> graphdataDaily = getGraphdataDaily(pointsInRound);
+        List<TakeoverSummaryDayRepresentation> takeoverSummaryDaily = getTakeoverSummaryDaily(pointsInRound);
 
-        return new GraphDataRepresentation(graphdataCumulative, graphdataDaily);
+        return new GraphDataRepresentation(graphdataCumulative, graphdataDaily, takeoverSummaryDaily);
     }
 
     private PointsInRound generateListOfPointsPerDayThisFarInCurrentRound(User user, ZonedDateTime now) {
@@ -513,6 +515,17 @@ public class ZoneService {
                 pointsTotalSum);
 
         return List.of(takepointDataset, pphDataset);
+    }
+
+    private List<TakeoverSummaryDayRepresentation> getTakeoverSummaryDaily(PointsInRound pointsInRound) {
+        List<TakeoverSummaryDayRepresentation> representations = new ArrayList<>();
+        List<PointsInDay> pointsInDay = pointsInRound.getPointsInDay();
+
+        for (int i = 0; i < pointsInDay.size(); i++) {
+            representations.add(TakeoverSummaryDayRepresentationConverter.toRepresentation(i, pointsInDay.get(i)));
+        }
+
+        return representations;
     }
 
     private PointsInRound calculatePointsPerDay(List<Takeover> takeovers, ZonedDateTime now, int numberOfDaysInRoundYet, String username) {

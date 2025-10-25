@@ -5,10 +5,14 @@ import java.util.List;
 public class GraphDataRepresentation {
     private final GraphDatasetRepresentation cumulative;
     private final List<DailyGraphDatasetRepresentation> daily;
+    private final List<TakeoverSummaryDayRepresentation> takeoverSummaryDaily;
 
-    public GraphDataRepresentation(GraphDatasetRepresentation cumulative, List<DailyGraphDatasetRepresentation> daily) {
+    public GraphDataRepresentation(GraphDatasetRepresentation cumulative,
+                                   List<DailyGraphDatasetRepresentation> daily,
+                                   List<TakeoverSummaryDayRepresentation> takeoverSummaryDaily) {
         this.cumulative = cumulative;
         this.daily = daily;
+        this.takeoverSummaryDaily = takeoverSummaryDaily;
     }
 
     public static GraphDataRepresentation tom() {
@@ -21,5 +25,9 @@ public class GraphDataRepresentation {
 
     public List<DailyGraphDatasetRepresentation> getDaily() {
         return daily;
+    }
+
+    public List<TakeoverSummaryDayRepresentation> getTakeoverSummaryDaily() {
+        return takeoverSummaryDaily;
     }
 }

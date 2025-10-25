@@ -197,14 +197,17 @@ public class Takeover {
         // 4 Assist
         // 5 Regular takeover
 
+        Integer accumulatingPph = accumulatingPph(now);
+        Integer zonesLeft = accumulatingPph > 0 ? 1 : 0;
+
         if (isNeutralZone()) {
 //            logger.info("tp: {}, pphPart: {}, 50, sum: {}", tp, pphPart(now),  tp + pphPart(now) + 50);
-            return new PointsInDay(tp + pphPart(now) + 50, tp.doubleValue(), pphPart(now) + 50);
+            return new PointsInDay(tp + pphPart(now) + 50, tp.doubleValue(), pphPart(now) + 50, accumulatingPph, zonesLeft);
         } else if (isRevisit()) {
-            return new PointsInDay(tp / 2.0, tp/2.0, 0.0);
+            return new PointsInDay(tp / 2.0, tp/2.0, 0.0, accumulatingPph, zonesLeft);
         }
 
-        return new PointsInDay(tp + pphPart(now), tp.doubleValue(), pphPart(now));
+        return new PointsInDay(tp + pphPart(now), tp.doubleValue(), pphPart(now), accumulatingPph, zonesLeft);
 
     }
 
@@ -221,7 +224,7 @@ public class Takeover {
             return 0.0;
         }
 
-        ZonedDateTime endTime = this.lostTime == null ? calculateEndTime(now) : this.lostTime;
+        ZonedDateTime endTime = calculateEndTime(now);
         Duration duration = Duration.between(this.takeoverTime, endTime);
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YY-MM-dd HH:mm:ss");
 //        String durationFormatted = String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
@@ -233,7 +236,19 @@ public class Takeover {
         return hours * this.pph;
     }
 
+    Integer accumulatingPph(ZonedDateTime now) {
+        if (type == TakeoverType.ASSIST || isRevisit()) {
+            return 0;
+        }
+
+        return calculateEndTime(now).isBefore(now) ? 0 : this.pph;
+    }
+
     ZonedDateTime calculateEndTime(ZonedDateTime now) {
+        if (this.lostTime != null) {
+            return this.lostTime;
+        }
+
         ZonedDateTime endtime = endtimeForRound();
         return now.isBefore(endtime) ? now : endtime;
     }
@@ -249,6 +264,4 @@ public class Takeover {
         return firstDayOfMonthOfThisRound.plusDays(7 - dayOfWeekForFirstInMonth);
     }
 
-
-    ///
 }
