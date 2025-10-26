@@ -14,7 +14,7 @@ class TakeoverSummaryDayRepresentationConverterTest {
         PointsInDay pointsInDay = new PointsInDay(97.8, 95.0, 2.8, 7, 1);
         TakeoverSummaryDayRepresentation representation = TakeoverSummaryDayRepresentationConverter.toRepresentation(0, pointsInDay);
         assertThat(representation.getWeek()).isEqualTo(1);
-        assertThat(representation.getDay()).isEqualTo("Sunday");
+        assertThat(representation.getDay()).isEqualTo("Söndag");
         assertThat(representation.getPointsTotal()).isEqualTo(98);
         assertThat(representation.getPointsPph()).isEqualTo(3);
     }
@@ -24,7 +24,7 @@ class TakeoverSummaryDayRepresentationConverterTest {
         PointsInDay pointsInDay = new PointsInDay(97.49, 95.0, 2.49, 7, 1);
         TakeoverSummaryDayRepresentation representation = TakeoverSummaryDayRepresentationConverter.toRepresentation(6, pointsInDay);
         assertThat(representation.getWeek()).isEqualTo(1);
-        assertThat(representation.getDay()).isEqualTo("Saturday");
+        assertThat(representation.getDay()).isEqualTo("Lördag");
         assertThat(representation.getPointsTotal()).isEqualTo(97);
         assertThat(representation.getPointsPph()).isEqualTo(2);
     }
@@ -34,7 +34,7 @@ class TakeoverSummaryDayRepresentationConverterTest {
         PointsInDay pointsInDay = new PointsInDay(97.5, 95.0, 2.5, 0, 0);
         TakeoverSummaryDayRepresentation representation = TakeoverSummaryDayRepresentationConverter.toRepresentation(7, pointsInDay);
         assertThat(representation.getWeek()).isEqualTo(2);
-        assertThat(representation.getDay()).isEqualTo("Sunday");
+        assertThat(representation.getDay()).isEqualTo("Söndag");
         assertThat(representation.getPointsTotal()).isEqualTo(98);
         assertThat(representation.getPointsPph()).isEqualTo(3);
     }

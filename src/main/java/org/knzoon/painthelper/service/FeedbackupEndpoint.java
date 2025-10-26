@@ -40,7 +40,7 @@ public class FeedbackupEndpoint {
         String dateTimeStr = feedInfo.getLatestFeedItemRead().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ"));
 //        logger.info("dateTimeStr: {}", dateTimeStr);
         String feedURL = getBaseURL() + feedInfo.getFeedName();
-        logger.info("baseURl:  {}", feedURL);
+//        logger.info("baseURl:  {}", feedURL);
         String uriString;
         URI uri;
 

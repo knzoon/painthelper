@@ -4,7 +4,7 @@ import org.knzoon.painthelper.model.PointsInDay;
 import org.knzoon.painthelper.representation.compare.TakeoverSummaryDayRepresentation;
 
 public class TakeoverSummaryDayRepresentationConverter {
-    private static final String[] WEEKDAYS = {"Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+    private static final String[] WEEKDAYS = {"Söndag","Måndag", "Tisdag", "Onsdag", "Torsdag", "Fredag", "Lördag"};
 
 
     public static TakeoverSummaryDayRepresentation toRepresentation(int index, PointsInDay pointsInDay) {
