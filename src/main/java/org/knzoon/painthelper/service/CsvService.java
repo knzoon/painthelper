@@ -8,6 +8,7 @@ import org.knzoon.painthelper.model.TakeoverRepository;
 import org.knzoon.painthelper.model.TakeoverType;
 import org.knzoon.painthelper.model.dto.NodeCsvDTO;
 import org.knzoon.painthelper.model.dto.RelationCsvDTO;
+import org.knzoon.painthelper.util.RoundCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,15 +33,13 @@ import java.util.stream.Collectors;
 public class CsvService {
 
     private final TakeoverRepository takeoverRepository;
-    private final RoundCalculator roundCalculator;
     private final PointsCalculator pointsCalculator;
 
 
     private Logger logger = LoggerFactory.getLogger(CsvService.class);
 
-    public CsvService(TakeoverRepository takeoverRepository, RoundCalculator roundCalculator, PointsCalculator pointsCalculator) {
+    public CsvService(TakeoverRepository takeoverRepository, PointsCalculator pointsCalculator) {
         this.takeoverRepository = takeoverRepository;
-        this.roundCalculator = roundCalculator;
         this.pointsCalculator = pointsCalculator;
     }
 
@@ -93,7 +92,7 @@ public class CsvService {
         ZonedDateTime endTime = takeover.getLostTimeConverted();
 
         if (endTime == null) {
-            endTime = roundCalculator.calculateEndTime(roundId, now);
+            endTime = RoundCalculator.calculateEndTime(roundId, now);
         }
 
         return pointsCalculator.pointsForTakeover(takeover, endTime);

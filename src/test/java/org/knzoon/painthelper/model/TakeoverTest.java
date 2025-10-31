@@ -1,17 +1,13 @@
 package org.knzoon.painthelper.model;
 
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.knzoon.painthelper.service.RoundCalculator;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.knzoon.painthelper.util.RoundCalculator;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAmount;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,14 +20,12 @@ class TakeoverTest {
     private ZonedDateTime takeoverTime;
     private Integer currentRound;
 
-    private RoundCalculator roundCalculator = new RoundCalculator();
-
     @BeforeEach
     void setUp() {
         now = Instant.now();
         nowAsDateTime = ZonedDateTime.ofInstant(now, ZoneId.of("UTC"));
         takeoverTime = ZonedDateTime.ofInstant(now.minus(Duration.ofHours(1)), ZoneId.of("UTC"));
-        currentRound = roundCalculator.roundFromDateTime(nowAsDateTime);
+        currentRound = RoundCalculator.roundFromDateTime(nowAsDateTime);
     }
 
     @Test

@@ -1,19 +1,33 @@
 package org.knzoon.painthelper.service;
 
-import org.knzoon.painthelper.model.*;
+import org.knzoon.painthelper.model.AreaView;
+import org.knzoon.painthelper.model.BroadcastMessage;
+import org.knzoon.painthelper.model.BroadcastMessageRepository;
+import org.knzoon.painthelper.model.Point;
+import org.knzoon.painthelper.model.RegionTakes;
+import org.knzoon.painthelper.model.RegionTakesRepository;
+import org.knzoon.painthelper.model.TakeoverRepository;
+import org.knzoon.painthelper.model.UniqueZone;
+import org.knzoon.painthelper.model.UniqueZoneRepository;
+import org.knzoon.painthelper.model.UniqueZoneView;
+import org.knzoon.painthelper.model.User;
+import org.knzoon.painthelper.model.UserRepository;
+import org.knzoon.painthelper.model.ValidationException;
+import org.knzoon.painthelper.model.Zone;
+import org.knzoon.painthelper.model.ZoneInfo;
+import org.knzoon.painthelper.model.ZoneRepository;
 import org.knzoon.painthelper.model.dto.DecoratedWardedDataDTO;
 import org.knzoon.painthelper.model.dto.DecoratedWardedZoneDTO;
 import org.knzoon.painthelper.model.dto.ImportResultWardedDTO;
 import org.knzoon.painthelper.model.dto.RegionTakesDTO;
 import org.knzoon.painthelper.model.dto.WardedDataDTO;
 import org.knzoon.painthelper.model.dto.ZoneSearchParamsDTO;
-import org.knzoon.painthelper.representation.*;
-import org.knzoon.painthelper.representation.compare.DailyGraphDatasetRepresentation;
-import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
-import org.knzoon.painthelper.representation.compare.GraphDatapointRepresentation;
-import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
-import org.knzoon.painthelper.representation.compare.TakeoverSummaryDayRepresentation;
-import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
+import org.knzoon.painthelper.representation.AreaRepresentation;
+import org.knzoon.painthelper.representation.BroadcastMessageRepresentation;
+import org.knzoon.painthelper.representation.RegionTakesRepresentation;
+import org.knzoon.painthelper.representation.UniqueZoneRepresentation;
+import org.knzoon.painthelper.representation.UniqueZoneSearchresultRepresentation;
+import org.knzoon.painthelper.util.RoundCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +35,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URISyntaxException;
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -37,7 +58,6 @@ public class ZoneService {
     private final ZoneRepository zoneRepository;
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final TakeoverRepository takeoverRepository;
-    private final RoundCalculator roundCalculator;
     private final PanToCalculator panToCalculator;
 
     private Logger logger = LoggerFactory.getLogger(ZoneService.class);
@@ -46,7 +66,7 @@ public class ZoneService {
     public ZoneService(WardedZoneDecorator wardedZoneDecorator, RegionTakesRepository regionTakesRepository,
                        UniqueZoneRepository uniqueZoneRepository, UserRepository userRepository,
                        ZoneRepository zoneRepository, BroadcastMessageRepository broadcastMessageRepository,
-                       TakeoverRepository takeoverRepository, RoundCalculator roundCalculator, PanToCalculator panToCalculator) {
+                       TakeoverRepository takeoverRepository, PanToCalculator panToCalculator) {
         this.wardedZoneDecorator = wardedZoneDecorator;
         this.regionTakesRepository = regionTakesRepository;
         this.uniqueZoneRepository = uniqueZoneRepository;
@@ -54,7 +74,6 @@ public class ZoneService {
         this.zoneRepository = zoneRepository;
         this.broadcastMessageRepository = broadcastMessageRepository;
         this.takeoverRepository = takeoverRepository;
-        this.roundCalculator = roundCalculator;
         this.panToCalculator = panToCalculator;
     }
 
@@ -145,7 +164,7 @@ public class ZoneService {
     }
 
     private List<UniqueZoneRepresentation> searchUniqueZonesInCurrentRound(ZoneSearchParamsDTO searchParamsDTO) {
-        Integer roundId = roundCalculator.roundFromDateTime(ZonedDateTime.now());
+        Integer roundId = RoundCalculator.roundFromDateTime(ZonedDateTime.now());
         logger.info("Search round: {} min: {} max: {}", roundId, searchParamsDTO.getMinTakes(), searchParamsDTO.getMaxTakes());
         List<UniqueZoneView> searchResult;
         // TODO verifiera att regionTakes hittas
@@ -343,27 +362,6 @@ public class ZoneService {
     }
 
     @Transactional
-    public List<UserRepresentation> searchUsers(String searchString) {
-        if (searchString.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<User> users = userRepository.findAllByUsernameIsStartingWithAndImportedIsTrueOrderByUsername(searchString);
-        return users.stream().map(this::toRepresentation).collect(Collectors.toList());
-
-    }
-
-    @Transactional
-    public List<UserRepresentation> searchAllUsers(String searchString) {
-        if (searchString.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<User> users = userRepository.findAllByUsernameIsStartingWithOrderByUsername(searchString);
-        return users.stream().map(this::toRepresentation).collect(Collectors.toList());
-    }
-
-
-    @Transactional
     public List<BroadcastMessageRepresentation> searchBroadcastMessages(Long userId) {
         if (userId == null) {
             return Collections.emptyList();
@@ -393,165 +391,6 @@ public class ZoneService {
         }
 
         return user.getLastImport();
-    }
-
-    private UserRepresentation toRepresentation(User user) {
-        return new UserRepresentation(user.getId(), user.getUsername());
-    }
-
-    @Transactional
-    public TurfEffortRepresentation getTurfEffortForUserAndCurrentRound(String username) {
-        User user = userRepository.findByUsername(username);
-        Integer roundId = roundCalculator.roundFromDateTime(ZonedDateTime.now());
-        List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
-        Route currentRoute = new Route();
-        List<Route> routes = new ArrayList<>();
-
-        for (Takeover takeover : takeovers) {
-            if (currentRoute.shouldContain(takeover)) {
-                currentRoute.add(takeover);
-            } else {
-                routes.add(currentRoute);
-                currentRoute = new Route(takeover);
-            }
-        }
-
-        if (!currentRoute.isEmpty()) {
-            routes.add(currentRoute);
-        }
-
-        ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
-        List<Route> filteredRoutes = routes.stream().filter(Route::hasMoreThanOneTake).collect(Collectors.toList());
-
-        List<PointsInDay> pointsPerDay = takeovers.stream().map(t -> t.pointsUntilNow(now)).collect(Collectors.toList());
-
-        return new TurfEffortRepresentation(
-                username,
-                calculateTimeSpentInRoutes(filteredRoutes),
-                calculatePointsForTakeovers(pointsPerDay),
-                takeovers.size(),
-                filteredRoutes.size(),
-                getTakesInRoutes(filteredRoutes),
-                calculatePphForTakeovers(pointsPerDay));
-    }
-
-    private String calculateTimeSpentInRoutes(List<Route> routes) {
-        Duration totalDuration = routes.stream().map(Route::timeSpent).reduce(Duration.ZERO, Duration::plus);
-        return totalDuration.toHours() + "h " + totalDuration.toMinutesPart() + "m";
-    }
-
-    private Integer calculatePointsForTakeovers(List<PointsInDay> pointsPerDay) {
-        Double points = pointsPerDay.stream().map(PointsInDay::getTotal).collect(Collectors.summingDouble(Double::doubleValue));
-        return (int) Math.round(points);
-    }
-
-    private Integer calculatePphForTakeovers(List<PointsInDay> pointsPerDay) {
-        Double points = pointsPerDay.stream().map(PointsInDay::getPph).collect(Collectors.summingDouble(Double::doubleValue));
-        return (int) Math.round(points);
-    }
-
-    private Integer getTakesInRoutes(List<Route> routes) {
-        return routes.stream().map(Route::nrofTakes).reduce(0, Integer::sum);
-    }
-
-    @Transactional
-    public GraphDataRepresentation getGraphData(String username) {
-        User user = userRepository.findByUsername(username);
-
-        if (user == null) {
-            return GraphDataRepresentation.tom();
-        }
-
-        ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
-        PointsInRound pointsInRound = generateListOfPointsPerDayThisFarInCurrentRound(user, now);
-
-        GraphDatasetRepresentation graphdataCumulative = getGraphdataCumulative(pointsInRound);
-        List<DailyGraphDatasetRepresentation> graphdataDaily = getGraphdataDaily(pointsInRound);
-        List<TakeoverSummaryDayRepresentation> takeoverSummaryDaily = getTakeoverSummaryDaily(pointsInRound);
-
-        return new GraphDataRepresentation(graphdataCumulative, graphdataDaily, takeoverSummaryDaily);
-    }
-
-    private PointsInRound generateListOfPointsPerDayThisFarInCurrentRound(User user, ZonedDateTime now) {
-        Integer roundId = roundCalculator.roundFromDateTime(now);
-        Integer currentDayOfRound = roundCalculator.dayOfRound(roundId, now);
-        List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
-
-        return calculatePointsPerDay(takeovers, now, currentDayOfRound, user.getUsername());
-    }
-
-    private GraphDatasetRepresentation getGraphdataCumulative(PointsInRound pointsInRound) {
-        List<Integer> cumulativePointsPerDay = pointsInRound.calculatePointsCumulative();
-
-        return new GraphDatasetRepresentation(
-                pointsInRound.getUsername(),
-                toDatapointRepresentationList(cumulativePointsPerDay),
-                pointsInRound.getPointsTotalSum());
-    }
-
-    private List<GraphDatapointRepresentation> toDatapointRepresentationList(List<Integer> pointsPerDay) {
-        List<GraphDatapointRepresentation> representationList = new ArrayList<>();
-        int day = 1;
-
-        for (Integer points : pointsPerDay) {
-            representationList.add(new GraphDatapointRepresentation(Integer.valueOf(day++).toString(), points));
-        }
-
-        return representationList;
-    }
-
-    private List<DailyGraphDatasetRepresentation> getGraphdataDaily(PointsInRound pointsPerDay) {
-        String username = pointsPerDay.getUsername();
-        Integer pointsTotalSum = pointsPerDay.getPointsTotalSum();
-
-        var takepointDataset = DailyGraphDatasetRepresentation.takepointDataset(
-                username,
-                pointsPerDay.dailyTakeoverPoints(),
-                pointsTotalSum);
-
-        var pphDataset = DailyGraphDatasetRepresentation.pphDataset(
-                username,
-                pointsPerDay.dailyPphPoints(),
-                pointsTotalSum);
-
-        return List.of(takepointDataset, pphDataset);
-    }
-
-    private List<TakeoverSummaryDayRepresentation> getTakeoverSummaryDaily(PointsInRound pointsInRound) {
-        List<TakeoverSummaryDayRepresentation> representations = new ArrayList<>();
-        List<PointsInDay> pointsInDay = pointsInRound.getPointsInDay();
-
-        for (int i = 0; i < pointsInDay.size(); i++) {
-            representations.add(TakeoverSummaryDayRepresentationConverter.toRepresentation(i, pointsInDay.get(i)));
-        }
-
-        return representations;
-    }
-
-    private PointsInRound calculatePointsPerDay(List<Takeover> takeovers, ZonedDateTime now, int numberOfDaysInRoundYet, String username) {
-        PointsInRound pointsInRound = new PointsInRound(username);
-
-        Map<Integer, List<Takeover>> takeoversPerDay = takeovers.stream().collect(Collectors.groupingBy(t -> roundCalculator.dayOfRound(t.getRoundId(), t.getTakeoverTime())));
-
-        for (int i = 1; i < numberOfDaysInRoundYet + 1; i++) {
-            pointsInRound.addDay(summPointsForDay(takeoversPerDay.get(i), now));
-        }
-
-        return pointsInRound;
-    }
-
-    private PointsInDay summPointsForDay(List<Takeover> takeovers, ZonedDateTime now) {
-        if (takeovers == null) {
-            return PointsInDay.ZERO;
-        }
-
-        return takeovers.stream().map(t -> t.pointsUntilNow(now)).reduce(PointsInDay.ZERO, PointsInDay::add);
-    }
-
-    @Transactional
-    public LatestTakeoverInfoRepresentation getLatestTakeover() {
-        Takeover latestTakeover = takeoverRepository.findLatestTakeover();
-        return new LatestTakeoverInfoRepresentation(latestTakeover.getZoneId(), latestTakeover.getTakeoverTime());
     }
 
 }

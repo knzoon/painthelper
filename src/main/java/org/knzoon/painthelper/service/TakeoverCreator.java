@@ -7,6 +7,7 @@ import org.knzoon.painthelper.model.User;
 import org.knzoon.painthelper.model.UserRepository;
 import org.knzoon.painthelper.representation.turfapi.FeedItem;
 import org.knzoon.painthelper.representation.turfapi.UserMinimal;
+import org.knzoon.painthelper.util.RoundCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,12 +21,11 @@ public class TakeoverCreator {
 
     private final UserRepository userRepository;
     private final TakeoverRepository takeoverRepository;
-    private final RoundCalculator roundCalculator;
+
     @Autowired
-    public TakeoverCreator(UserRepository userRepository, TakeoverRepository takeoverRepository, RoundCalculator roundCalculator) {
+    public TakeoverCreator(UserRepository userRepository, TakeoverRepository takeoverRepository) {
         this.userRepository = userRepository;
         this.takeoverRepository = takeoverRepository;
-        this.roundCalculator = roundCalculator;
     }
 
     public int saveTakeovers(FeedItem feedItem) {
@@ -74,7 +74,7 @@ public class TakeoverCreator {
     }
 
     private void saveTakeover(FeedItem feedItem, User currentUser, User previousUser, TakeoverType takeoverType, User assistingUser) {
-        int roundId = roundCalculator.roundFromDateTime(feedItem.getTime());
+        int roundId = RoundCalculator.roundFromDateTime(feedItem.getTime());
 
         if (TakeoverType.TAKEOVER.equals(takeoverType) && previousUser != null && !previousUser.getId().equals(currentUser.getId())) {
             updatePreviousTakeOnZone(feedItem, currentUser, previousUser, roundId);

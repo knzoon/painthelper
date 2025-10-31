@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
+import org.knzoon.painthelper.util.RoundCalculator;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -249,19 +250,7 @@ public class Takeover {
             return this.lostTime;
         }
 
-        ZonedDateTime endtime = endtimeForRound();
-        return now.isBefore(endtime) ? now : endtime;
-    }
-
-    ZonedDateTime endtimeForRound() {
-        ZonedDateTime startTimeNextRound = starttimeForRound(this.roundId + 1);
-        return startTimeNextRound.minusSeconds(1);
-    }
-
-    ZonedDateTime starttimeForRound(Integer roundId) {
-        ZonedDateTime firstDayOfMonthOfThisRound = FIRST_DAY_OF_MONTH_FIRST_ROUND.plusMonths(roundId - 1);
-        int dayOfWeekForFirstInMonth = firstDayOfMonthOfThisRound.getDayOfWeek().getValue();
-        return firstDayOfMonthOfThisRound.plusDays(7 - dayOfWeekForFirstInMonth);
+        return RoundCalculator.calculateEndTime(this.roundId, now);
     }
 
 }
