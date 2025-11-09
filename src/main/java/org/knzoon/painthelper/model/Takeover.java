@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 @Entity
 public class Takeover {
@@ -58,11 +59,6 @@ public class Takeover {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "next_user_id")
     private User nextUser;
-
-    private static final int MIDDAY_HOUR = 12;
-    private static final int MIDDAY_MINUTE = 0;
-    private static final ZonedDateTime FIRST_DAY_OF_MONTH_FIRST_ROUND = ZonedDateTime.of(LocalDateTime.of(2010, 7, 1, MIDDAY_HOUR, MIDDAY_MINUTE), ZoneId.of("Europe/Stockholm"));
-
 
     public Takeover() {
     }
@@ -189,7 +185,18 @@ public class Takeover {
         this.nextUser = nextUser;
     }
 
-    /// Copied from LeagueHelper
+    public Optional<User> previousUser() {
+        return Optional.ofNullable(this.previousUser);
+    }
+
+    public Optional<User> assistingUser() {
+        return Optional.ofNullable(this.assistingUser);
+    }
+
+    public Optional<User> nextUser() {
+        return Optional.ofNullable(this.nextUser);
+    }
+
     public PointsInDay pointsUntilNow(ZonedDateTime now) {
         // Five cases
         // 1 Neutral zone takeover
@@ -200,15 +207,16 @@ public class Takeover {
 
         Integer accumulatingPph = accumulatingPph(now);
         Integer zonesLeft = accumulatingPph > 0 ? 1 : 0;
+        Duration duration = takeoverDuration(now);
 
         if (isNeutralZone()) {
 //            logger.info("tp: {}, pphPart: {}, 50, sum: {}", tp, pphPart(now),  tp + pphPart(now) + 50);
-            return new PointsInDay(tp + pphPart(now) + 50, tp.doubleValue(), pphPart(now) + 50, accumulatingPph, zonesLeft);
+            return new PointsInDay(tp + pphPart(now) + 50, tp.doubleValue(), pphPart(now) + 50, accumulatingPph, zonesLeft, duration);
         } else if (isRevisit()) {
-            return new PointsInDay(tp / 2.0, tp/2.0, 0.0, accumulatingPph, zonesLeft);
+            return new PointsInDay(tp / 2.0, tp/2.0, 0.0, accumulatingPph, zonesLeft, duration);
         }
 
-        return new PointsInDay(tp + pphPart(now), tp.doubleValue(), pphPart(now), accumulatingPph, zonesLeft);
+        return new PointsInDay(tp + pphPart(now), tp.doubleValue(), pphPart(now), accumulatingPph, zonesLeft, duration);
 
     }
 
@@ -225,8 +233,7 @@ public class Takeover {
             return 0.0;
         }
 
-        ZonedDateTime endTime = calculateEndTime(now);
-        Duration duration = Duration.between(this.takeoverTime, endTime);
+        Duration duration = takeoverDuration(now);
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("YY-MM-dd HH:mm:ss");
 //        String durationFormatted = String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
 //        logger.info("takeoverId: {}, {} {} {}", id, takeoverTime.format(formatter), zoneId, durationFormatted);
@@ -245,12 +252,25 @@ public class Takeover {
         return calculateEndTime(now).isBefore(now) ? 0 : this.pph;
     }
 
+    Duration takeoverDuration(ZonedDateTime now) {
+        if (type == TakeoverType.ASSIST || isRevisit()) {
+            return Duration.ZERO;
+        }
+
+        ZonedDateTime endTime = calculateEndTime(now);
+        return Duration.between(this.takeoverTime, endTime);
+    }
+
     ZonedDateTime calculateEndTime(ZonedDateTime now) {
         if (this.lostTime != null) {
             return this.lostTime;
         }
 
         return RoundCalculator.calculateEndTime(this.roundId, now);
+    }
+
+    public Integer dayOfRound() {
+        return RoundCalculator.dayOfRound(this.roundId, this.takeoverTime);
     }
 
 }

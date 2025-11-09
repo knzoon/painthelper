@@ -53,4 +53,8 @@ public class Route {
 
         return Duration.between(takeovers.get(0).getTakeoverTime(), lastTakeover().getTakeoverTime());
     }
+
+    public List<Takeover> takeovers() {
+        return takeovers;
+    }
 }

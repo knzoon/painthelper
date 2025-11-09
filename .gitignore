@@ -28,6 +28,7 @@ target/
 *.log
 .env
 build_local.sh
+run_newly_build.sh
 
 ### Angular ####
 src/main/ui/dist/

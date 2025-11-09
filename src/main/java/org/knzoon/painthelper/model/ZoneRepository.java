@@ -41,4 +41,6 @@ public interface ZoneRepository extends JpaRepository<Zone, Long> {
 
     List<Zone> findByRegionIdAndAreaId(Long regionId, Long areaId);
 
+    List<Zone> findByIdIn(Set<Long> ids);
+
 }

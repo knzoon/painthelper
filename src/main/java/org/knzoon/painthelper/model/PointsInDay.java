@@ -1,5 +1,7 @@
 package org.knzoon.painthelper.model;
 
+import java.time.Duration;
+
 public class PointsInDay {
 
     private final Double total;
@@ -8,24 +10,27 @@ public class PointsInDay {
     private final Integer accumulatingPph;
     private final Integer zones;
     private final Integer zonesLeft;
-    public static final PointsInDay ZERO = new PointsInDay(0.0, 0.0, 0.0, 0, 0, 0);
+    private final Duration duration;
+    public static final PointsInDay ZERO = new PointsInDay(0.0, 0.0, 0.0, 0, 0, 0, Duration.ZERO);
 
-    private PointsInDay(Double total, Double takepoint, Double pph, Integer accumulatingPph, Integer zones, Integer zonesLeft) {
+    private PointsInDay(Double total, Double takepoint, Double pph, Integer accumulatingPph, Integer zones, Integer zonesLeft, Duration duration) {
         this.total = total;
         this.takepoint = takepoint;
         this.pph = pph;
         this.accumulatingPph = accumulatingPph;
         this.zones = zones;
         this.zonesLeft = zonesLeft;
+        this.duration = duration;
     }
 
-    public PointsInDay(Double total, Double takepoint, Double pph, Integer accumulatingPph, Integer zonesLeft) {
+    public PointsInDay(Double total, Double takepoint, Double pph, Integer accumulatingPph, Integer zonesLeft, Duration duration) {
         this.total = total;
         this.takepoint = takepoint;
         this.pph = pph;
         this.accumulatingPph = accumulatingPph;
         this.zones = 1;
         this.zonesLeft = zonesLeft;
+        this.duration = duration;
     }
 
     public Double getTotal() {
@@ -71,7 +76,16 @@ public class PointsInDay {
                 this.pph + pointsInDay.getPph(),
                 this.accumulatingPph + pointsInDay.getAccumulatingPph(),
                 this.zones + pointsInDay.getZones(),
-                this.zonesLeft + pointsInDay.getZonesLeft()
+                this.zonesLeft + pointsInDay.getZonesLeft(),
+                this.duration.plus(pointsInDay.getDuration())
         );
+    }
+
+    public boolean hasAccumulatingPph() {
+        return accumulatingPph > 0;
+    }
+
+    public Duration getDuration() {
+        return duration;
     }
 }

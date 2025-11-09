@@ -3,15 +3,20 @@ package org.knzoon.painthelper.service;
 import org.knzoon.painthelper.model.PointsInDay;
 import org.knzoon.painthelper.model.PointsInRound;
 import org.knzoon.painthelper.model.Route;
+import org.knzoon.painthelper.model.RouteFactory;
 import org.knzoon.painthelper.model.Takeover;
 import org.knzoon.painthelper.model.TakeoverRepository;
+import org.knzoon.painthelper.model.TakeoversInRound;
 import org.knzoon.painthelper.model.User;
 import org.knzoon.painthelper.model.UserRepository;
+import org.knzoon.painthelper.model.Zone;
+import org.knzoon.painthelper.model.ZoneRepository;
 import org.knzoon.painthelper.representation.LatestTakeoverInfoRepresentation;
 import org.knzoon.painthelper.representation.compare.DailyGraphDatasetRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatapointRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
+import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
 import org.knzoon.painthelper.representation.compare.TakeoverSummaryDayRepresentation;
 import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
 import org.knzoon.painthelper.util.RoundCalculator;
@@ -23,20 +28,25 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
 public class TakeoverService {
     private final TakeoverRepository takeoverRepository;
     private final UserRepository userRepository;
+    private final ZoneRepository zoneRepository;
 
     @Autowired
-    public TakeoverService(TakeoverRepository takeoverRepository, UserRepository userRepository) {
+    public TakeoverService(TakeoverRepository takeoverRepository, UserRepository userRepository, ZoneRepository zoneRepository) {
         this.takeoverRepository = takeoverRepository;
         this.userRepository = userRepository;
+        this.zoneRepository = zoneRepository;
     }
 
     @Transactional
@@ -50,24 +60,13 @@ public class TakeoverService {
         User user = userRepository.findByUsername(username);
         Integer roundId = RoundCalculator.roundFromDateTime(ZonedDateTime.now());
         List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
-        Route currentRoute = new Route();
-        List<Route> routes = new ArrayList<>();
-
-        for (Takeover takeover : takeovers) {
-            if (currentRoute.shouldContain(takeover)) {
-                currentRoute.add(takeover);
-            } else {
-                routes.add(currentRoute);
-                currentRoute = new Route(takeover);
-            }
-        }
-
-        if (!currentRoute.isEmpty()) {
-            routes.add(currentRoute);
-        }
+        List<Route> routes = RouteFactory.from(takeovers);
 
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
-        List<Route> filteredRoutes = routes.stream().filter(Route::hasMoreThanOneTake).collect(Collectors.toList());
+        List<Route> filteredRoutes = RouteFactory.from(takeovers)
+                .stream()
+                .filter(Route::hasMoreThanOneTake)
+                .collect(Collectors.toList());
 
         List<PointsInDay> pointsPerDay = takeovers.stream().map(t -> t.pointsUntilNow(now)).collect(Collectors.toList());
 
@@ -120,30 +119,10 @@ public class TakeoverService {
 
     private PointsInRound generateListOfPointsPerDayThisFarInCurrentRound(User user, ZonedDateTime now) {
         Integer roundId = RoundCalculator.roundFromDateTime(now);
-        Integer currentDayOfRound = RoundCalculator.dayOfRound(roundId, now);
         List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
+        TakeoversInRound takeoversInRound = new TakeoversInRound(roundId, now, takeovers);
 
-        return calculatePointsPerDay(takeovers, now, currentDayOfRound, user.getUsername());
-    }
-
-    private PointsInRound calculatePointsPerDay(List<Takeover> takeovers, ZonedDateTime now, int numberOfDaysInRoundYet, String username) {
-        PointsInRound pointsInRound = new PointsInRound(username);
-
-        Map<Integer, List<Takeover>> takeoversPerDay = takeovers.stream().collect(Collectors.groupingBy(t -> RoundCalculator.dayOfRound(t.getRoundId(), t.getTakeoverTime())));
-
-        for (int i = 1; i < numberOfDaysInRoundYet + 1; i++) {
-            pointsInRound.addDay(summPointsForDay(takeoversPerDay.get(i), now));
-        }
-
-        return pointsInRound;
-    }
-
-    private PointsInDay summPointsForDay(List<Takeover> takeovers, ZonedDateTime now) {
-        if (takeovers == null) {
-            return PointsInDay.ZERO;
-        }
-
-        return takeovers.stream().map(t -> t.pointsUntilNow(now)).reduce(PointsInDay.ZERO, PointsInDay::add);
+        return takeoversInRound.calculatePointsPerDay(user.getUsername());
     }
 
     private GraphDatasetRepresentation getGraphdataCumulative(PointsInRound pointsInRound) {
@@ -192,6 +171,65 @@ public class TakeoverService {
         }
 
         return representations;
+    }
+
+    @Transactional
+    public List<List<List<TakeoverRepresentation>>> getTakeoversForUser(String username) {
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            return List.of();
+        }
+
+        ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
+        Integer roundId = RoundCalculator.roundFromDateTime(now);
+        List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
+        TakeoversInRound takeoversInRound = new TakeoversInRound(roundId, now, takeovers);
+
+        Map<Long, Zone> zoneMap = zoneRepository.findByIdIn(takeoversInRound.zonesInTakeovers()).stream()
+                .collect(Collectors.toMap(Zone::getId, Function.identity()));
+
+        List<List<Route>> routesPerDayInRound = takeoversInRound.getRoutesPerDay();
+
+        return routesPerDayInRound.stream()
+                .map(routesInDay -> toRepresentation(routesInDay, now, zoneMap))
+                .toList();
+    }
+
+    private List<List<TakeoverRepresentation>> toRepresentation(List<Route> routesInDay, ZonedDateTime now, Map<Long, Zone> zoneMap) {
+        return routesInDay.stream()
+                .map(route -> toRepresentation(route, now, zoneMap))
+                .toList();
+    }
+
+    private List<TakeoverRepresentation> toRepresentation(Route route, ZonedDateTime now, Map<Long, Zone> zoneMap) {
+        return route.takeovers().stream()
+                .map(takeover -> toRepresentation(takeover, now, zoneMap))
+                .toList();
+    }
+
+    private TakeoverRepresentation toRepresentation(Takeover takeover, ZonedDateTime now, Map<Long, Zone> zoneMap) {
+        PointsInDay pointsUntilNow = takeover.pointsUntilNow(now);
+        Optional<Zone> zone = Optional.ofNullable(zoneMap.get(takeover.getZoneId()));
+        var builder = TakeoverRepresentation.builder();
+        builder.withTakeoverTime(takeover.getTakeoverTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
+                .withTp(takeover.getTp())
+                .withPph(takeover.getPph())
+                .withActivity(takeover.getType().toString())
+                .withPoints(pointsUntilNow.getTotalRounded())
+                .withDuration(formattedDuration(pointsUntilNow.getDuration()))
+                .withAccumulating(pointsUntilNow.hasAccumulatingPph());
+        zone.ifPresent(z -> builder.withZoneName(z.getName()));
+        zone.ifPresent(z -> Optional.ofNullable(z.getAreaName()).ifPresent(builder::withAreaName));
+        takeover.previousUser().ifPresent(user -> builder.withPreviousUser(user.getUsername()));
+        takeover.nextUser().ifPresent(user -> builder.withNextUser(user.getUsername()));
+        takeover.assistingUser().ifPresent(user -> builder.withAssistingUser(user.getUsername()));
+
+        return builder.build();
+    }
+
+    private String formattedDuration(Duration duration) {
+        return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
 
 }
