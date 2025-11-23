@@ -273,4 +273,12 @@ public class Takeover {
         return RoundCalculator.dayOfRound(this.roundId, this.takeoverTime);
     }
 
+    public String activity() {
+        if (isRevisit()) {
+            return "REVISIT";
+        }
+
+        return type.toString();
+    }
+
 }

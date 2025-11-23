@@ -41,12 +41,17 @@ public class TakeoverService {
     private final TakeoverRepository takeoverRepository;
     private final UserRepository userRepository;
     private final ZoneRepository zoneRepository;
+    private  final TakeoverRepresentationConverter takeoverRepresentationConverter;
 
     @Autowired
-    public TakeoverService(TakeoverRepository takeoverRepository, UserRepository userRepository, ZoneRepository zoneRepository) {
+    public TakeoverService(TakeoverRepository takeoverRepository,
+                           UserRepository userRepository,
+                           ZoneRepository zoneRepository,
+                           TakeoverRepresentationConverter takeoverRepresentationConverter) {
         this.takeoverRepository = takeoverRepository;
         this.userRepository = userRepository;
         this.zoneRepository = zoneRepository;
+        this.takeoverRepresentationConverter = takeoverRepresentationConverter;
     }
 
     @Transactional
@@ -192,44 +197,9 @@ public class TakeoverService {
         List<List<Route>> routesPerDayInRound = takeoversInRound.getRoutesPerDay();
 
         return routesPerDayInRound.stream()
-                .map(routesInDay -> toRepresentation(routesInDay, now, zoneMap))
+                .map(routesInDay -> takeoverRepresentationConverter.toRepresentation(routesInDay, now, zoneMap))
                 .toList();
     }
 
-    private List<List<TakeoverRepresentation>> toRepresentation(List<Route> routesInDay, ZonedDateTime now, Map<Long, Zone> zoneMap) {
-        return routesInDay.stream()
-                .map(route -> toRepresentation(route, now, zoneMap))
-                .toList();
-    }
-
-    private List<TakeoverRepresentation> toRepresentation(Route route, ZonedDateTime now, Map<Long, Zone> zoneMap) {
-        return route.takeovers().stream()
-                .map(takeover -> toRepresentation(takeover, now, zoneMap))
-                .toList();
-    }
-
-    private TakeoverRepresentation toRepresentation(Takeover takeover, ZonedDateTime now, Map<Long, Zone> zoneMap) {
-        PointsInDay pointsUntilNow = takeover.pointsUntilNow(now);
-        Optional<Zone> zone = Optional.ofNullable(zoneMap.get(takeover.getZoneId()));
-        var builder = TakeoverRepresentation.builder();
-        builder.withTakeoverTime(takeover.getTakeoverTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
-                .withTp(takeover.getTp())
-                .withPph(takeover.getPph())
-                .withActivity(takeover.getType().toString())
-                .withPoints(pointsUntilNow.getTotalRounded())
-                .withDuration(formattedDuration(pointsUntilNow.getDuration()))
-                .withAccumulating(pointsUntilNow.hasAccumulatingPph());
-        zone.ifPresent(z -> builder.withZoneName(z.getName()));
-        zone.ifPresent(z -> Optional.ofNullable(z.getAreaName()).ifPresent(builder::withAreaName));
-        takeover.previousUser().ifPresent(user -> builder.withPreviousUser(user.getUsername()));
-        takeover.nextUser().ifPresent(user -> builder.withNextUser(user.getUsername()));
-        takeover.assistingUser().ifPresent(user -> builder.withAssistingUser(user.getUsername()));
-
-        return builder.build();
-    }
-
-    private String formattedDuration(Duration duration) {
-        return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
-    }
 
 }
