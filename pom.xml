@@ -14,7 +14,7 @@
 	<name>painthelper</name>
 	<description>Project for helping Turfers plan their activities</description>
 	<scm>
-		<developerConnection>scm:git:https://github.com/knzoon/sandbox.git</developerConnection>
+		<developerConnection>scm:git:https://github.com/knzoon/painthelper.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 	<distributionManagement>
