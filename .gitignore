@@ -29,6 +29,7 @@ target/
 .env
 build_local.sh
 run_newly_build.sh
+/release_me.sh
 
 ### Angular ####
 src/main/ui/dist/
