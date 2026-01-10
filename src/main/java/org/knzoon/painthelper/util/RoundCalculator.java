@@ -18,7 +18,7 @@ public class RoundCalculator {
     }
 
     public static int roundFromDateTime(ZonedDateTime dateTime) {
-        ZonedDateTime dateTimeSwe = dateTime.withZoneSameInstant(ZoneId.of("Europe/Stockholm"));
+        ZonedDateTime dateTimeSwe = UTCSwedishTimeConverter.convert(dateTime);
 
         int yearsAfterStart = dateTimeSwe.getYear() - CALCULATOR_STARTYEAR;
         int roundBasedOnYear = START_ROUND + yearsAfterStart * 12;
@@ -33,7 +33,7 @@ public class RoundCalculator {
     }
 
     static boolean beforeRoundstart(ZonedDateTime dateTime) {
-        ZonedDateTime dateTimeSwe = dateTime.withZoneSameInstant(ZoneId.of("Europe/Stockholm"));
+        ZonedDateTime dateTimeSwe = UTCSwedishTimeConverter.convert(dateTime);
         ZonedDateTime sundayMiddaySwe = dateTimeSwe.with(ChronoField.DAY_OF_WEEK, 7).with(ChronoField.HOUR_OF_DAY, MIDDAY_HOUR).with(ChronoField.MINUTE_OF_HOUR, MIDDAY_MINUTE);
 
         if ((dateTimeSwe.getMonthValue() != sundayMiddaySwe.getMonthValue()) || (sundayMiddaySwe.getDayOfMonth() > 7)) {

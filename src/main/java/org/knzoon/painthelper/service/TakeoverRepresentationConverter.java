@@ -5,6 +5,8 @@ import org.knzoon.painthelper.model.Route;
 import org.knzoon.painthelper.model.Takeover;
 import org.knzoon.painthelper.model.Zone;
 import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
+import org.knzoon.painthelper.util.DurationFormatter;
+import org.knzoon.painthelper.util.UTCSwedishTimeConverter;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -33,12 +35,12 @@ public class TakeoverRepresentationConverter {
         PointsInDay pointsUntilNow = takeover.pointsUntilNow(now);
         Optional<Zone> zone = Optional.ofNullable(zoneMap.get(takeover.getZoneId()));
         var builder = TakeoverRepresentation.builder();
-        builder.withTakeoverTime(takeover.getTakeoverTime().format(DateTimeFormatter.ofPattern("HH:mm:ss")))
+        builder.withTakeoverTime(UTCSwedishTimeConverter.convert(takeover.getTakeoverTime()).format(DateTimeFormatter.ofPattern("HH:mm:ss")))
                 .withTp(takeover.getTp())
                 .withPph(takeover.getPph())
                 .withActivity(takeover.activity())
                 .withPoints(pointsUntilNow.getTotalRounded())
-                .withDuration(formattedDuration(pointsUntilNow.getDuration()))
+                .withDuration(DurationFormatter.format(pointsUntilNow.getDuration()))
                 .withAccumulating(pointsUntilNow.hasAccumulatingPph());
         zone.ifPresent(z -> builder.withZoneName(z.getName()));
         zone.ifPresent(z -> Optional.ofNullable(z.getAreaName()).ifPresent(builder::withAreaName));
@@ -47,14 +49,6 @@ public class TakeoverRepresentationConverter {
         takeover.assistingUser().ifPresent(user -> builder.withAssistingUser(user.getUsername()));
 
         return builder.build();
-    }
-
-    String formattedDuration(Duration duration) {
-        if (duration.toDays() > 0) {
-            return String.format("%d dagar %02d:%02d:%02d", duration.toDays(), duration.toHoursPart(), duration.toMinutesPart(), duration.toSecondsPart());
-        }
-
-        return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
 
 }

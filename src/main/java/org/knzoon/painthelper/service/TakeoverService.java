@@ -19,6 +19,7 @@ import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
 import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
 import org.knzoon.painthelper.representation.compare.TakeoverSummaryDayRepresentation;
 import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
+import org.knzoon.painthelper.util.DurationFormatter;
 import org.knzoon.painthelper.util.RoundCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -87,7 +88,7 @@ public class TakeoverService {
 
     private String calculateTimeSpentInRoutes(List<Route> routes) {
         Duration totalDuration = routes.stream().map(Route::timeSpent).reduce(Duration.ZERO, Duration::plus);
-        return totalDuration.toHours() + "h " + totalDuration.toMinutesPart() + "m";
+        return DurationFormatter.format(totalDuration);
     }
 
     private Integer calculatePointsForTakeovers(List<PointsInDay> pointsPerDay) {
