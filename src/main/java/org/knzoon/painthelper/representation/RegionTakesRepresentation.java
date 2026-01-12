@@ -9,29 +9,14 @@ public class RegionTakesRepresentation {
 
     private final Long userId;
 
-    private final String untaken;
+    private final TakesColorDistributionRepresentation takesColorDistribution;
 
-    private final String green;
-
-    private final String yellow;
-
-    private final String orange;
-
-    private final String red;
-
-    private final String purple;
-
-    public RegionTakesRepresentation(Long id, String regionName, Long regionId, Long userId, String untaken, String green, String yellow, String orange, String red, String purple) {
+    public RegionTakesRepresentation(Long id, String regionName, Long regionId, Long userId, TakesColorDistributionRepresentation takesColorDistribution) {
         this.id = id;
         this.regionName = regionName;
         this.regionId = regionId;
         this.userId = userId;
-        this.untaken = untaken;
-        this.green = green;
-        this.yellow = yellow;
-        this.orange = orange;
-        this.red = red;
-        this.purple = purple;
+        this.takesColorDistribution = takesColorDistribution;
     }
 
     public Long getId() {
@@ -50,27 +35,7 @@ public class RegionTakesRepresentation {
         return userId;
     }
 
-    public String getUntaken() {
-        return untaken;
-    }
-
-    public String getGreen() {
-        return green;
-    }
-
-    public String getYellow() {
-        return yellow;
-    }
-
-    public String getOrange() {
-        return orange;
-    }
-
-    public String getRed() {
-        return red;
-    }
-
-    public String getPurple() {
-        return purple;
+    public TakesColorDistributionRepresentation getTakesColorDistribution() {
+        return takesColorDistribution;
     }
 }

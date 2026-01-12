@@ -25,6 +25,7 @@ import org.knzoon.painthelper.model.dto.ZoneSearchParamsDTO;
 import org.knzoon.painthelper.representation.AreaRepresentation;
 import org.knzoon.painthelper.representation.BroadcastMessageRepresentation;
 import org.knzoon.painthelper.representation.RegionTakesRepresentation;
+import org.knzoon.painthelper.representation.TakesColorDistributionRepresentation;
 import org.knzoon.painthelper.representation.UniqueZoneRepresentation;
 import org.knzoon.painthelper.representation.UniqueZoneSearchresultRepresentation;
 import org.knzoon.painthelper.util.RoundCalculator;
@@ -283,17 +284,17 @@ public class ZoneService {
     private RegionTakesDTO decorateRegionTakes(RegionTakes regionTakes) {
 
 //        Instant before = Instant.now();
-        String untaken = zoneRepository.countZonesByNotTakenAndRegionIdAndRegionTakesId(regionTakes.getRegionId(), regionTakes.getId()).toString();
+        Integer untaken = zoneRepository.countZonesByNotTakenAndRegionIdAndRegionTakesId(regionTakes.getRegionId(), regionTakes.getId());
 //        Instant afterUntaken = Instant.now();
-        String green = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 1, 1).toString();
+        Integer green = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 1, 1);
 //        Instant afterGreen = Instant.now();
-        String yellow = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 2, 10).toString();
+        Integer yellow = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 2, 10);
 //        Instant afterYellow = Instant.now();
-        String orange = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 11, 20).toString();
+        Integer orange = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 11, 20);
 //        Instant afterOrange = Instant.now();
-        String red = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 21, 50).toString();
+        Integer red = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 21, 50);
 //        Instant afterRed = Instant.now();
-        String purple = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 51, 100000).toString();
+        Integer purple = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakes.getId(), 51, 100000);
 //        Instant afterPurple = Instant.now();
 //        logger.info("Region {}", regionTakes.getRegionName());
 //        logger.info("Time total {} Time untaken {} Time green {} Time Yellow {} Time Orange {} Time Red {} Time Purple {}",
@@ -305,13 +306,13 @@ public class ZoneService {
 //                Duration.between(afterOrange, afterRed).toMillis(),
 //                Duration.between(afterRed, afterPurple).toMillis()
 //                );
-        return new RegionTakesDTO(regionTakes, untaken, green, yellow, orange, red, purple);
+        return new RegionTakesDTO(regionTakes, new TakesColorDistributionRepresentation(untaken, green, yellow, orange, red, purple));
     }
 
     private RegionTakesRepresentation toRepresentation(RegionTakesDTO regionTakesDTO) {
         RegionTakes regionTakes = regionTakesDTO.getRegionTakes();
         return new RegionTakesRepresentation(regionTakes.getId(), regionTakes.getRegionName(), regionTakes.getRegionId(), regionTakes.getUserId(),
-                regionTakesDTO.getUntaken(), regionTakesDTO.getGreen(), regionTakesDTO.getYellow(), regionTakesDTO.getOrange(), regionTakesDTO.getRed(), regionTakesDTO.getPurple());
+                regionTakesDTO.getTakesColorDistributionRepresentation());
     }
 
     @Transactional
@@ -347,17 +348,17 @@ public class ZoneService {
 
     private AreaRepresentation toRepresentation(AreaView areaView, Long regionTakesId, Long regionId) {
         String areaString = areaView.getArea() + " (" + areaView.getAntal() + ")";
-        String untaken = zoneRepository.countZonesByNotTakenAndRegionIdAndRegionTakesIdAndAreaId(regionId, regionTakesId, areaView.getAreaId()).toString();
+        Integer untaken = zoneRepository.countZonesByNotTakenAndRegionIdAndRegionTakesIdAndAreaId(regionId, regionTakesId, areaView.getAreaId());
 
         if (areaView.getAntal() < 1 ) {
-            return new AreaRepresentation(areaView.getAreaId(), areaString, untaken, "0", "0", "0", "0", "0");
+            return new AreaRepresentation(areaView.getAreaId(), areaString, new TakesColorDistributionRepresentation(untaken, 0, 0, 0, 0, 0));
         } else {
-            String green = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 1, 1).toString();
-            String yellow = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 2, 10).toString();
-            String orange = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 11, 20).toString();
-            String red = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 21, 50).toString();
-            String purple = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 51, 100000).toString();
-            return new AreaRepresentation(areaView.getAreaId(), areaString, untaken, green, yellow, orange, red, purple);
+            Integer green = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 1, 1);
+            Integer yellow = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 2, 10);
+            Integer orange = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 11, 20);
+            Integer red = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 21, 50);
+            Integer purple = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaView.getAreaId(), 51, 100000);
+            return new AreaRepresentation(areaView.getAreaId(), areaString, new TakesColorDistributionRepresentation(untaken, green, yellow, orange, red, purple));
         }
     }
 

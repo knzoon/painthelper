@@ -11,6 +11,7 @@ import {User} from "../user";
 import {ImportResult} from "../import-result";
 import {Greeting} from "../greeting";
 import {BroadcastMessage} from "../broadcast-message";
+import {TakesColorDistribution} from "../takes-color-distribution";
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -76,17 +77,17 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   layerGroup: any;
 
-  untakenBox: string = "";
+  untakenBox: number = 0;
   untakenBoxPercent: string = ""
-  greenbox: string = "";
+  greenbox: number = 0;
   greenboxPercent: string = "";
-  yellowbox: string = "";
+  yellowbox: number = 0;
   yellowboxPercent: string = "";
-  orangebox: string = "";
+  orangebox: number = 0;
   orangeboxPercent: string = "";
-  redbox: string = "";
+  redbox: number = 0;
   redboxPercent: string = "";
-  purplebox: string = "";
+  purplebox: number = 0;
   purpleboxPercent: string = "";
 
 
@@ -291,19 +292,8 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   private populateColorboxesForRegion() {
     if (this.selectedRegion) {
-      let totalAmount = this.totalAmountFromRegion(this.selectedRegion);
-      this.untakenBox = this.selectedRegion.untaken;
-      this.untakenBoxPercent = this.buildPercentString(this.selectedRegion.untaken, totalAmount);
-      this.greenbox = this.selectedRegion.green;
-      this.greenboxPercent =  this.buildPercentString(this.selectedRegion.green, totalAmount);
-      this.yellowbox = this.selectedRegion.yellow;
-      this.yellowboxPercent = this.buildPercentString(this.selectedRegion.yellow, totalAmount);
-      this.orangebox = this.selectedRegion.orange;
-      this.orangeboxPercent = this.buildPercentString(this.selectedRegion.orange, totalAmount);
-      this.redbox = this.selectedRegion.red;
-      this.redboxPercent = this.buildPercentString(this.selectedRegion.red, totalAmount);
-      this.purplebox = this.selectedRegion.purple;
-      this.purpleboxPercent = this.buildPercentString(this.selectedRegion.purple, totalAmount);
+      let totalAmount = this.totalAmountFromDifferentColors(this.selectedRegion.takesColorDistribution);
+      this.populateColorboxes(this.selectedRegion.takesColorDistribution, totalAmount);
     } else {
       this.clearBoxes();
     }
@@ -311,43 +301,34 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   private populateColorboxesForArea() {
     if (this.selectedArea) {
-      let totalAmount = this.totalAmountFromArea(this.selectedArea);
-      this.untakenBox = this.selectedArea.untaken;
-      this.untakenBoxPercent = this.buildPercentString(this.selectedArea.untaken, totalAmount);
-      this.greenbox = this.selectedArea.green;
-      this.greenboxPercent =  this.buildPercentString(this.selectedArea.green, totalAmount);
-      this.yellowbox = this.selectedArea.yellow;
-      this.yellowboxPercent = this.buildPercentString(this.selectedArea.yellow, totalAmount);
-      this.orangebox = this.selectedArea.orange;
-      this.orangeboxPercent = this.buildPercentString(this.selectedArea.orange, totalAmount);
-      this.redbox = this.selectedArea.red;
-      this.redboxPercent = this.buildPercentString(this.selectedArea.red, totalAmount);
-      this.purplebox = this.selectedArea.purple;
-      this.purpleboxPercent = this.buildPercentString(this.selectedArea.purple, totalAmount);
+      let totalAmount = this.totalAmountFromDifferentColors(this.selectedArea.takesColorDistribution);
+      this.populateColorboxes(this.selectedArea.takesColorDistribution, totalAmount);
     } else {
       this.clearBoxes();
     }
   }
 
-  private totalAmountFromRegion(region: RegionTakes): number {
-    return this.totalAmountOfTakes(+region.untaken, +region.green, +region.yellow, +region.orange, +region.red, +region.purple);
+  private totalAmountFromDifferentColors(distribution: TakesColorDistribution): number {
+    return distribution.untaken + distribution.green + distribution.yellow + distribution.orange + distribution.red + distribution.purple;
   }
 
-  private totalAmountFromArea(area: Area): number {
-    return this.totalAmountOfTakes(+area.untaken, +area.green, +area.yellow, +area.orange, +area.red, +area.purple);
+  private populateColorboxes(takesColorDistribution: TakesColorDistribution, totalAmount: number) {
+    this.untakenBox = takesColorDistribution.untaken;
+    this.untakenBoxPercent = this.buildPercentString(takesColorDistribution.untaken, totalAmount);
+    this.greenbox = takesColorDistribution.green;
+    this.greenboxPercent =  this.buildPercentString(takesColorDistribution.green, totalAmount);
+    this.yellowbox = takesColorDistribution.yellow;
+    this.yellowboxPercent = this.buildPercentString(takesColorDistribution.yellow, totalAmount);
+    this.orangebox = takesColorDistribution.orange;
+    this.orangeboxPercent = this.buildPercentString(takesColorDistribution.orange, totalAmount);
+    this.redbox = takesColorDistribution.red;
+    this.redboxPercent = this.buildPercentString(takesColorDistribution.red, totalAmount);
+    this.purplebox = takesColorDistribution.purple;
+    this.purpleboxPercent = this.buildPercentString(takesColorDistribution.purple, totalAmount);
   }
 
-  private totalAmountOfTakes(untaken: number, green: number, yellow: number, orange: number, red: number, purple: number): number {
-    return untaken + green + yellow + orange + red + purple;
-  }
-
-  private buildPercentStringOld(part: string, total:number): string {
-    let percent: number = +part  * 100/ total;
-    return part + " (" + percent.toFixed() + "%)";
-  }
-
-  private buildPercentString(part: string, total:number): string {
-    let percent: number = +part  * 100/ total;
+  private buildPercentString(part: number, total:number): string {
+    let percent: number = part  * 100/ total;
     return "(" + percent.toFixed() + "%)";
   }
 
@@ -372,12 +353,12 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   }
 
   private clearBoxes() {
-    this.untakenBox = "0";
-    this.greenbox = "0";
-    this.yellowbox = "0";
-    this.orangebox = "0";
-    this.redbox = "0";
-    this.purplebox = "0";
+    this.untakenBox = 0;
+    this.greenbox = 0;
+    this.yellowbox = 0;
+    this.orangebox = 0;
+    this.redbox = 0;
+    this.purplebox = 0;
   }
 
   private clearAreaSelect() {
