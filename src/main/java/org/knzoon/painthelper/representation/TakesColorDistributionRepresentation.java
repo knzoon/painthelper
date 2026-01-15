@@ -1,5 +1,7 @@
 package org.knzoon.painthelper.representation;
 
+import org.knzoon.painthelper.model.TakesColorDistribution;
+
 public class TakesColorDistributionRepresentation {
     private final Integer untaken;
     private final Integer green;
@@ -20,6 +22,15 @@ public class TakesColorDistributionRepresentation {
         this.orange = orange;
         this.red = red;
         this.purple = purple;
+    }
+
+    public TakesColorDistributionRepresentation(TakesColorDistribution colorDistribution) {
+        this.untaken = colorDistribution.untaken();
+        this.green = colorDistribution.green();
+        this.yellow = colorDistribution.yellow();
+        this.orange = colorDistribution.orange();
+        this.red = colorDistribution.red();
+        this.purple = colorDistribution.purple();
     }
 
     public Integer getUntaken() {

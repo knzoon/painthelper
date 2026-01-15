@@ -23,14 +23,11 @@ public interface ZoneRepository extends JpaRepository<Zone, Long> {
     @Query(value = "select count(1) from `zone` z left outer join unique_zone uz on z.id = uz.zone_id and uz.region_takes_id = :regionTakesId where z.region_id = :regionId and z.area_id = :areaId and uz.id is null", nativeQuery = true)
     Integer countZonesByNotTakenAndRegionIdAndRegionTakesIdAndAreaId(@Param("regionId") Long regionId, @Param("regionTakesId") Long regionTakesId, @Param("areaId") Long areaId);
 
-    /*
-        select z.* from `zone` z
-        left outer join unique_zone uz on z.id = uz.zone_id and uz.region_takes_id = 79
-        where z.region_id = 127
-        and z.area_id = 2064
-        and uz.id is null
-        order by z.area_name, z.name;
-     */
+    @Query(value = "select count(1) from `zone` z left outer join takeover t on t.zone_id = z.id and t.round_id = :roundId and t.user_id = :userId where z.region_id = :regionId and t.id is null", nativeQuery = true)
+    Integer countZonesByNotTakenAndUserIdAndRoundIdAndRegionId(Long userId, Integer roundId, Long regionId);
+
+    @Query(value = "select count(1) from `zone` z left outer join takeover t on t.zone_id = z.id and t.round_id = :roundId and t.user_id = :userId where z.region_id = :regionId and z.area_id = :areaId and t.id is null", nativeQuery = true)
+    Integer countZonesByNotTakenAndUserIdAndRoundIdAndRegionIdAndAreaId(Long userId, Integer roundId, Long regionId, Long areaId);
 
     @Query(value = "select distinct z.area_id as areaId, z.area_name as area, 0 as antal from `zone` z where z.region_id = :regionId order by z.area_name", nativeQuery = true)
     List<AreaView> findDistinctAreasByRegionId(Long regionId);

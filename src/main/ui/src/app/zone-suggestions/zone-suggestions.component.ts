@@ -95,11 +95,11 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   ngOnInit(): void {
     this.testingPopulatingUser();
+    this.populatingSearchRoundOnlyFromLocalstorage()
     this.testingPopulatingRegion();
     this.testingPopulatingArea();
     this.populatingMinTakesFromLocalstorage();
     this.populatingMaxTakesFromLocalstorage();
-    this. populatingSearchRoundOnlyFromLocalstorage()
   }
 
   ngAfterViewInit(): void {
@@ -219,7 +219,6 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   userChanged(event : any) {
     let userName = event.username;
-    console.info("event.username: " + userName);
     const jsonData = JSON.stringify(this.selectedUser);
     localStorage.setItem(this.lsUserKey, jsonData);
     if (this.selectedUser) {
@@ -248,6 +247,12 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   handleSearchOnlyRoundChange() {
     const jsonData = JSON.stringify(this.searchRoundOnly);
     localStorage.setItem(this.lsSearchRoundOnly, jsonData);
+
+    if (this.selectedArea) {
+      this.populateColorboxesForArea();
+    } else {
+      this.populateColorboxesForRegion();
+    }
   }
 
   updateRegions(userName: string) {
@@ -255,13 +260,9 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
     this.clearSearchresult();
     this.clearAreaSelect();
     this.clearMarkers();
-    console.info("apa3: ");
 
     this.zoneService.getRegions(userName).subscribe((regions: RegionTakes[]) => {
-      console.info("region size before: " + this.regionTakes.length);
-      console.info("regions from server size: " + regions.length);
       this.regionTakes = regions;
-      console.info("region size after: " + this.regionTakes.length);
 
       if (this.regionTakes.length == 0) {
         this.errorFindingUser = "noUserFound";
@@ -269,7 +270,6 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
         this.regionTakesId = 0;
       } else {
         this.errorFindingUser = undefined;
-        console.info('Bra användare: ' + userName);
       }
     });
   }
@@ -292,17 +292,21 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   private populateColorboxesForRegion() {
     if (this.selectedRegion) {
-      let totalAmount = this.totalAmountFromDifferentColors(this.selectedRegion.takesColorDistribution);
-      this.populateColorboxes(this.selectedRegion.takesColorDistribution, totalAmount);
+      let colorDistribution = this.searchRoundOnly ? this.selectedRegion.roundColorDistribution : this.selectedRegion.takesColorDistribution;
+      let totalAmount = this.totalAmountFromDifferentColors(colorDistribution);
+      this.populateColorboxes(colorDistribution, totalAmount);
     } else {
       this.clearBoxes();
     }
   }
 
   private populateColorboxesForArea() {
+    console.info('populateColorboxesForArea');
     if (this.selectedArea) {
-      let totalAmount = this.totalAmountFromDifferentColors(this.selectedArea.takesColorDistribution);
-      this.populateColorboxes(this.selectedArea.takesColorDistribution, totalAmount);
+      console.info('searchRoundOnly: ' + this.searchRoundOnly);
+      let colorDistribution = this.searchRoundOnly ? this.selectedArea.roundColorDistribution : this.selectedArea.takesColorDistribution;
+      let totalAmount = this.totalAmountFromDifferentColors(colorDistribution);
+      this.populateColorboxes(colorDistribution, totalAmount);
     } else {
       this.clearBoxes();
     }
@@ -343,7 +347,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
       this.regionTakesId = this.selectedRegion.id;
       this.selectedArea = undefined;
-      console.info("RegionTakesId: " + this.selectedRegion.id);
+      // console.info("RegionTakesId: " + this.selectedRegion.id);
       this.populateColorboxesForRegion();
       this.populateAreaSelect();
     } else {
@@ -373,6 +377,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
       this.populateColorboxesForArea();
     } else {
+      localStorage.removeItem(this.lsAreaKey);
       this.populateColorboxesForRegion();
     }
   }
@@ -423,17 +428,15 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   }
 
   zoneInListSelected(zone: UniqueZone) {
-    console.info("lat: " + zone.latitude + " long: " + zone.longitude);
     this.map.panTo(new L.LatLng(zone.latitude, zone.longitude));
   }
 
   testingPopulatingUser() {
     const jsonStringFromStorage = localStorage.getItem(this.lsUserKey);
-    console.info('user jsonString from storage:' + jsonStringFromStorage);
+    //console.info('user jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let user : User= JSON.parse(jsonStringFromStorage);
-      console.info(user.id + '-' + user.username);
       this.selectedUser = user;
       this.userChanged(user);
     }
@@ -442,11 +445,10 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   testingPopulatingRegion() {
     const jsonStringFromStorage = localStorage.getItem(this.lsRegionKey);
-    console.info('region jsonString from storage:' + jsonStringFromStorage);
+  //  console.info('region jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let region : RegionTakes = JSON.parse(jsonStringFromStorage);
-      console.info(region.id + '-' + region.regionName);
       this.selectedRegion = region;
       this.chooseRegion();
     }
@@ -455,11 +457,10 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   testingPopulatingArea() {
     const jsonStringFromStorage = localStorage.getItem(this.lsAreaKey);
-    console.info('area jsonString from storage:' + jsonStringFromStorage);
+  //  console.info('area jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let area : Area = JSON.parse(jsonStringFromStorage);
-      console.info(area.id + '-' + area.areaName);
       this.selectedArea = area;
       this.chooseArea();
     }
@@ -468,7 +469,6 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   populatingMinTakesFromLocalstorage() {
     const jsonStringFromStorage = localStorage.getItem(this.lsMinTakesKey);
-    console.info('minTakes jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let minTakes: number = JSON.parse(jsonStringFromStorage);
@@ -478,7 +478,6 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   populatingMaxTakesFromLocalstorage() {
     const jsonStringFromStorage = localStorage.getItem(this.lsMaxTakesKey);
-    console.info('minTakes jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let maxTakes: number = JSON.parse(jsonStringFromStorage);
@@ -488,7 +487,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   populatingSearchRoundOnlyFromLocalstorage() {
     const jsonStringFromStorage = localStorage.getItem(this.lsSearchRoundOnly);
-    console.info('searchRoundOnly jsonString from storage:' + jsonStringFromStorage);
+//    console.info('searchRoundOnly jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let searchRoundOnly: boolean = JSON.parse(jsonStringFromStorage);

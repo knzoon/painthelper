@@ -6,4 +6,5 @@ export interface RegionTakes {
   regionName: string;
   userId: number;
   takesColorDistribution: TakesColorDistribution;
+  roundColorDistribution: TakesColorDistribution;
 }

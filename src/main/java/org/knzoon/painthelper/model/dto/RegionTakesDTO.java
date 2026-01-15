@@ -6,10 +6,14 @@ import org.knzoon.painthelper.representation.TakesColorDistributionRepresentatio
 public class RegionTakesDTO {
     private final RegionTakes regionTakes;
     private final TakesColorDistributionRepresentation takesColorDistributionRepresentation;
+    private final TakesColorDistributionRepresentation roundColorDistributionRepresentation;
 
-    public RegionTakesDTO(RegionTakes regionTakes, TakesColorDistributionRepresentation takesColorDistributionRepresentation) {
+    public RegionTakesDTO(RegionTakes regionTakes,
+                          TakesColorDistributionRepresentation takesColorDistributionRepresentation,
+                          TakesColorDistributionRepresentation roundColorDistributionRepresentation) {
         this.regionTakes = regionTakes;
         this.takesColorDistributionRepresentation = takesColorDistributionRepresentation;
+        this.roundColorDistributionRepresentation = roundColorDistributionRepresentation;
     }
 
     public RegionTakes getRegionTakes() {
@@ -18,5 +22,9 @@ public class RegionTakesDTO {
 
     public TakesColorDistributionRepresentation getTakesColorDistributionRepresentation() {
         return takesColorDistributionRepresentation;
+    }
+
+    public TakesColorDistributionRepresentation getRoundColorDistributionRepresentation() {
+        return roundColorDistributionRepresentation;
     }
 }
