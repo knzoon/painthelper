@@ -7,7 +7,6 @@ import org.knzoon.painthelper.model.Point;
 import org.knzoon.painthelper.model.RegionTakes;
 import org.knzoon.painthelper.model.RegionTakesRepository;
 import org.knzoon.painthelper.model.TakeoverRepository;
-import org.knzoon.painthelper.model.TakesColorDistribution;
 import org.knzoon.painthelper.model.UniqueZone;
 import org.knzoon.painthelper.model.UniqueZoneRepository;
 import org.knzoon.painthelper.model.UniqueZoneView;
@@ -17,6 +16,7 @@ import org.knzoon.painthelper.model.ValidationException;
 import org.knzoon.painthelper.model.Zone;
 import org.knzoon.painthelper.model.ZoneInfo;
 import org.knzoon.painthelper.model.ZoneRepository;
+import org.knzoon.painthelper.model.dto.AreaDTO;
 import org.knzoon.painthelper.model.dto.DecoratedWardedDataDTO;
 import org.knzoon.painthelper.model.dto.DecoratedWardedZoneDTO;
 import org.knzoon.painthelper.model.dto.ImportResultWardedDTO;
@@ -48,7 +48,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Component
 public class ZoneService {
@@ -61,14 +60,20 @@ public class ZoneService {
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final TakeoverRepository takeoverRepository;
     private final PanToCalculator panToCalculator;
+    private final TakesColorDistributionDecorator takesColorDistributionDecorator;
 
     private Logger logger = LoggerFactory.getLogger(ZoneService.class);
 
     @Autowired
-    public ZoneService(WardedZoneDecorator wardedZoneDecorator, RegionTakesRepository regionTakesRepository,
-                       UniqueZoneRepository uniqueZoneRepository, UserRepository userRepository,
-                       ZoneRepository zoneRepository, BroadcastMessageRepository broadcastMessageRepository,
-                       TakeoverRepository takeoverRepository, PanToCalculator panToCalculator) {
+    public ZoneService(WardedZoneDecorator wardedZoneDecorator,
+                       RegionTakesRepository regionTakesRepository,
+                       UniqueZoneRepository uniqueZoneRepository,
+                       UserRepository userRepository,
+                       ZoneRepository zoneRepository,
+                       BroadcastMessageRepository broadcastMessageRepository,
+                       TakeoverRepository takeoverRepository,
+                       PanToCalculator panToCalculator,
+                       TakesColorDistributionDecorator takesColorDistributionDecorator) {
         this.wardedZoneDecorator = wardedZoneDecorator;
         this.regionTakesRepository = regionTakesRepository;
         this.uniqueZoneRepository = uniqueZoneRepository;
@@ -77,6 +82,7 @@ public class ZoneService {
         this.broadcastMessageRepository = broadcastMessageRepository;
         this.takeoverRepository = takeoverRepository;
         this.panToCalculator = panToCalculator;
+        this.takesColorDistributionDecorator = takesColorDistributionDecorator;
     }
 
     @Transactional
@@ -259,14 +265,12 @@ public class ZoneService {
             return Collections.emptyList();
         }
 
-//        Instant before = Instant.now();
-        Iterable<RegionTakes> regionTakes = regionTakesRepository.findAllByUserIdOrderByRegionName(user.getId());
-//        Instant afterRegionTakesFetched = Instant.now();
-        List<RegionTakesDTO> regionTakesDTOS = getListOfRegionsDecoratedWithDetails(regionTakes);
-//        Instant afterDecoration = Instant.now();
-//        logger.info("Time spent total {} Time spent decoration {}", Duration.between(before, afterDecoration).toMillis(), Duration.between(afterRegionTakesFetched, afterDecoration).toMillis());
+        List<RegionTakes> regionTakes = regionTakesRepository.findAllByUserIdOrderByRegionName(user.getId());
 
-        return regionTakesDTOS.stream().map(this::toRepresentation).collect(Collectors.toList());
+        return regionTakes.stream()
+                .map(takesColorDistributionDecorator::decorateRegionTakes)
+                .map(this::toRepresentation)
+                .collect(Collectors.toList());
     }
 
     private User getUser(String username) {
@@ -278,46 +282,14 @@ public class ZoneService {
         return user;
     }
 
-    private List<RegionTakesDTO> getListOfRegionsDecoratedWithDetails(Iterable<RegionTakes> regionTakes) {
-        return StreamSupport.stream(regionTakes.spliterator(), false).map(this::decorateRegionTakes).collect(Collectors.toList());
-    }
-
-    private RegionTakesDTO decorateRegionTakes(RegionTakes regionTakes) {
-        return new RegionTakesDTO(regionTakes,
-                takesColorDistributionEntireRegion(regionTakes.getRegionId(), regionTakes.getId()),
-                takesColorDistributionInRoundEntireRegion(regionTakes.getUserId(), regionTakes.getRegionId()));
-    }
-
-    private TakesColorDistributionRepresentation takesColorDistributionEntireRegion(Long regionId, Long regionTakesId) {
-        // TODO This should be refactored using TakesColorDistribution
-        Integer untaken = zoneRepository.countZonesByNotTakenAndRegionIdAndRegionTakesId(regionId, regionTakesId);
-        Integer green = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakesId, 1, 1);
-        Integer yellow = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakesId, 2, 10);
-        Integer orange = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakesId, 11, 20);
-        Integer red = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakesId, 21, 50);
-        Integer purple = uniqueZoneRepository.countByRegionTakesIdAndTakesBetween(regionTakesId, 51, 100000);
-
-        return new TakesColorDistributionRepresentation(untaken, green, yellow, orange, red, purple);
-    }
-
-    private TakesColorDistributionRepresentation takesColorDistributionInRoundEntireRegion(Long userId, Long regionId) {
-        int roundId = RoundCalculator.roundFromDateTime(ZonedDateTime.now());
-
-        Integer untaken = zoneRepository.countZonesByNotTakenAndUserIdAndRoundIdAndRegionId(userId, roundId, regionId);
-        List<UniqueZoneView> uniqueZones = takeoverRepository.findUniqueZonesForUserRoundAndRegion(roundId, userId, regionId);
-        TakesColorDistribution colorDistribution = new TakesColorDistribution(untaken, uniqueZones);
-
-        return new TakesColorDistributionRepresentation(colorDistribution);
-    }
-
     private RegionTakesRepresentation toRepresentation(RegionTakesDTO regionTakesDTO) {
         RegionTakes regionTakes = regionTakesDTO.getRegionTakes();
         return new RegionTakesRepresentation(regionTakes.getId(),
                 regionTakes.getRegionName(),
                 regionTakes.getRegionId(),
                 regionTakes.getUserId(),
-                regionTakesDTO.getTakesColorDistributionRepresentation(),
-                regionTakesDTO.getRoundColorDistributionRepresentation());
+                new TakesColorDistributionRepresentation(regionTakesDTO.getTakesColorDistribution()),
+                new TakesColorDistributionRepresentation(regionTakesDTO.getRoundColorDistribution()));
     }
 
     @Transactional
@@ -328,69 +300,42 @@ public class ZoneService {
             return List.of();
         }
 
-        List<AreaView> areasWithTakenZones = uniqueZoneRepository.findDistinctAreasByTakenAndRegionTakesId(regionTakesId);
-        Map<Long, AreaView> mappedTakenAreas = areasWithTakenZones.stream().collect(Collectors.toMap(AreaView::getAreaId, Function.identity()));
-
         RegionTakes regionTakes = regionTakesFromDB.get();
-        List<AreaView> distinctAreasByRegionId = zoneRepository.findDistinctAreasByRegionId(regionTakes.getRegionId());
-
-        List<AreaView> areasWithoutTakenZones = distinctAreasByRegionId.stream().filter(areaView -> hasNoTakenZones(areaView, mappedTakenAreas)).collect(Collectors.toList());
-
-        List<AreaRepresentation> completeAreaList = new ArrayList<>();
+        List<AreaView> completeAreaList = new ArrayList<>();
+        List<AreaView> areasWithTakenZones = uniqueZoneRepository.findDistinctAreasByTakenAndRegionTakesId(regionTakesId);
 
         if (!areasWithTakenZones.isEmpty()) {
-            completeAreaList.addAll(areasWithTakenZones.stream().map(areaView -> toRepresentation(areaView, regionTakes.getUserId(), regionTakesId, regionTakes.getRegionId())).collect(Collectors.toList()));
+            completeAreaList.addAll(areasWithTakenZones);
         }
 
-        completeAreaList.addAll(areasWithoutTakenZones.stream().map(areaView -> toRepresentation(areaView, regionTakes.getUserId(), regionTakesId, regionTakes.getRegionId())).collect(Collectors.toList()));
+        completeAreaList.addAll(areasWithoutTakenZones(areasWithTakenZones, regionTakes.getRegionId()));
 
-        return completeAreaList;
+        return completeAreaList.stream()
+                .map(area -> takesColorDistributionDecorator.decorateArea(area, regionTakes))
+                .map(this::toRepresentation)
+                .collect(Collectors.toList());
+    }
+
+    private List<AreaView> areasWithoutTakenZones(List<AreaView> areasWithTakenZones, Long regionId) {
+        Map<Long, AreaView> mappedTakenAreas = areasWithTakenZones.stream().collect(Collectors.toMap(AreaView::getAreaId, Function.identity()));
+        List<AreaView> distinctAreasByRegionId = zoneRepository.findDistinctAreasByRegionId(regionId);
+
+        return distinctAreasByRegionId.stream().filter(areaView -> hasNoTakenZones(areaView, mappedTakenAreas)).collect(Collectors.toList());
     }
 
     private boolean hasNoTakenZones(AreaView areaView, Map<Long, AreaView> mapOfTaken) {
         return !mapOfTaken.containsKey(areaView.getAreaId());
     }
 
-    private AreaRepresentation toRepresentation(AreaView areaView, Long userId, Long regionTakesId, Long regionId) {
-        String areaString = areaView.getArea() + " (" + areaView.getAntal() + ")";
-        boolean neverTaken = areaView.getAntal() < 1;
+    private AreaRepresentation toRepresentation(AreaDTO areaDTO) {
+        String areaString = areaDTO.getAreaView().getArea() + " (" + areaDTO.getAreaView().getAntal() + ")";
 
-        return new AreaRepresentation(areaView.getAreaId(),
-                    areaString,
-                    takesColorDistributionAreaOfRegion(regionId, regionTakesId, areaView.getAreaId(), neverTaken),
-                    takesColorDistributionInRoundAreaOfRegion(userId, regionId, areaView.getAreaId(), neverTaken));
+        return new AreaRepresentation(areaDTO.getAreaView().getAreaId(),
+                areaString,
+                new TakesColorDistributionRepresentation(areaDTO.getTakesColorDistribution()),
+                new TakesColorDistributionRepresentation(areaDTO.getRoundColorDistribution()));
     }
 
-    private TakesColorDistributionRepresentation takesColorDistributionAreaOfRegion(Long regionId, Long regionTakesId, Long areaId, boolean neverTaken) {
-        Integer untaken = zoneRepository.countZonesByNotTakenAndRegionIdAndRegionTakesIdAndAreaId(regionId, regionTakesId, areaId);
-
-        if (neverTaken) {
-            return new TakesColorDistributionRepresentation(untaken, 0, 0, 0, 0, 0);
-        }
-
-        // TODO This should be refactored using TakesColorDistribution
-        Integer green = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaId, 1, 1);
-        Integer yellow = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaId, 2, 10);
-        Integer orange = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaId, 11, 20);
-        Integer red = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaId, 21, 50);
-        Integer purple = uniqueZoneRepository.countByRegionTakesIdAndZoneAreaIdAndTakesBetween(regionTakesId, areaId, 51, 100000);
-
-        return new TakesColorDistributionRepresentation(untaken, green, yellow, orange, red, purple);
-    }
-
-    private TakesColorDistributionRepresentation takesColorDistributionInRoundAreaOfRegion(Long userId, Long regionId, Long areaId, boolean neverTaken) {
-        int roundId = RoundCalculator.roundFromDateTime(ZonedDateTime.now());
-        Integer untaken = zoneRepository.countZonesByNotTakenAndUserIdAndRoundIdAndRegionIdAndAreaId(userId, roundId, regionId, areaId);
-
-        if (neverTaken) {
-            return new TakesColorDistributionRepresentation(untaken, 0, 0, 0, 0, 0);
-        }
-
-        List<UniqueZoneView> uniqueZones = takeoverRepository.findUniqueZonesForUserRoundAreaAndRegion(roundId, userId, regionId, areaId);
-        TakesColorDistribution colorDistribution = new TakesColorDistribution(untaken, uniqueZones);
-
-        return new TakesColorDistributionRepresentation(colorDistribution);
-    }
 
     @Transactional
     public List<BroadcastMessageRepresentation> searchBroadcastMessages(Long userId) {

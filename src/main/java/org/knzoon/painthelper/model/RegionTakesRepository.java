@@ -10,7 +10,7 @@ import java.util.List;
 public interface RegionTakesRepository extends JpaRepository<RegionTakes, Long> {
     RegionTakes findByUserIdAndRegionId(Long userId, Long regionId);
 
-    Iterable<RegionTakes> findAllByUserIdOrderByRegionName(Long userId);
+    List<RegionTakes> findAllByUserIdOrderByRegionName(Long userId);
 
     boolean existsByUserIdAndRegionId(Long userId, Long regionId);
 

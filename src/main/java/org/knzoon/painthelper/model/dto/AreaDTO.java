@@ -1,21 +1,21 @@
 package org.knzoon.painthelper.model.dto;
 
-import org.knzoon.painthelper.model.RegionTakes;
+import org.knzoon.painthelper.model.AreaView;
 import org.knzoon.painthelper.model.TakesColorDistribution;
 
-public class RegionTakesDTO {
-    private final RegionTakes regionTakes;
+public class AreaDTO {
+    private final AreaView areaView;
     private final TakesColorDistribution takesColorDistribution;
     private final TakesColorDistribution roundColorDistribution;
 
-    public RegionTakesDTO(RegionTakes regionTakes, TakesColorDistribution takesColorDistribution, TakesColorDistribution roundColorDistribution) {
-        this.regionTakes = regionTakes;
+    public AreaDTO(AreaView areaView, TakesColorDistribution takesColorDistribution, TakesColorDistribution roundColorDistribution) {
+        this.areaView = areaView;
         this.takesColorDistribution = takesColorDistribution;
         this.roundColorDistribution = roundColorDistribution;
     }
 
-    public RegionTakes getRegionTakes() {
-        return regionTakes;
+    public AreaView getAreaView() {
+        return areaView;
     }
 
     public TakesColorDistribution getTakesColorDistribution() {

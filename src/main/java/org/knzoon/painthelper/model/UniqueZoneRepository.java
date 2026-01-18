@@ -16,14 +16,7 @@ public interface UniqueZoneRepository extends JpaRepository<UniqueZone, Long> {
 
     Iterable<UniqueZone> findByZoneZoneId(Long zoneId);
 
-    Integer countByRegionTakesIdAndTakesBetween(Long regionTakesId, Integer minTakes, Integer maxTakes);
-
-    Integer countByRegionTakesIdAndZoneAreaIdAndTakesBetween(Long regionTakesId, Long areaId, Integer minTakes, Integer maxTakes);
-
     @Query(value = "select uz.area_id as areaId, uz.area as area, count(uz.area) as antal from unique_zone uz where uz.region_takes_id = :regionTakesId group by uz.area_id, uz.area order by uz.area", nativeQuery = true)
     List<AreaView> findDistinctAreasByTakenAndRegionTakesId(Long regionTakesId);
-
-
-
 
 }

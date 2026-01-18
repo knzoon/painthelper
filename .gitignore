@@ -27,9 +27,10 @@ target/
 ### misc ###
 *.log
 .env
-build_local.sh
-run_newly_build.sh
+/build_local.sh
+/run_newly_build.sh
 /release_me.sh
+/deploy_frontend_to_test.sh
 
 ### Angular ####
 src/main/ui/dist/
