@@ -2,7 +2,11 @@ package org.knzoon.painthelper.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.knzoon.painthelper.model.dto.WardedDataDTO;
 import org.knzoon.painthelper.representation.warded.UniqueWardedZones;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,6 +63,15 @@ class WardedRegionDataParserTest {
         UniqueWardedZones uniqueWardedZones = objectMapper.readValue(jsonData, UniqueWardedZones.class);
 
         assertThat(uniqueWardedZones).isNotNull();
+    }
+
+    @Test
+    public void canParseEntireFile() throws Exception {
+        WardedRegionDataParser parser = new WardedRegionDataParser();
+        WardedDataDTO wardedDataDTO = parser.parse(new BufferedReader(new FileReader("src/test/resources/WardedTestfile.html")));
+        assertThat(wardedDataDTO.getUsername()).isEqualTo("praktikus");
+        assertThat(wardedDataDTO.getUniqueWardedZones()).isNotNull();
+        assertThat(wardedDataDTO.getUniqueWardedZones().size()).isGreaterThan(0);
     }
 
 }

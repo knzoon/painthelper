@@ -40,7 +40,7 @@ public class FileUploadController {
     public ImportResultRepresentation uploadDataForRegion(@RequestParam("file") MultipartFile file) throws URISyntaxException {
         try {
             logger.info("File that is being uploaded and parsed: {}", file.getOriginalFilename());
-            WardedDataDTO wardedDataDTO = wardedRegionDataParser.parse(file);
+            WardedDataDTO wardedDataDTO = wardedRegionDataParser.parseFile(file);
             List<ImportResultWardedDTO> importResults = zoneService.importZones(wardedDataDTO);
 
             String importInfo = createInfoString(importResults);

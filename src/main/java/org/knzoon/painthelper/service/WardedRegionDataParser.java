@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
@@ -17,64 +18,75 @@ import java.nio.charset.StandardCharsets;
 public class WardedRegionDataParser {
 
     Logger logger = LoggerFactory.getLogger(WardedRegionDataParser.class);
+    private final static String MAP_SEARCHPATTERN = "<button class=\"dropbtn\">";
     private final static String USERNAME_SEARCHPATTERN = "<button class=\"dropbtn\">";
     private final static String DATA_START_SEARCHPATTERN = "\"type\":\"FeatureCollection\"";
     private final static String PRE_ACTUAL_DATA = "unique\":{\"type\":\"geojson\",\"data\":";
     private final static String POST_ACTUAL_DATA = "}}]}";
 
-    public WardedDataDTO parse(MultipartFile file) {
+    public WardedDataDTO parseFile(MultipartFile file) {
         try {
-            String username = null;
-
-            String theActualData = "";
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
-            boolean searchingForUsername = true;
-            boolean searchingForStartOfData = false;
-            String line = bufferedReader.readLine();
-            while (line != null) {
-
-                if (searchingForUsername) {
-                    int searchpatternFoundAtIndex = line.indexOf(USERNAME_SEARCHPATTERN);
-
-                    if (searchpatternFoundAtIndex != -1) {
-                        username = parseUsername(searchpatternFoundAtIndex, line);
-
-                        logger.info("found username {}", username);
-                        searchingForUsername = false;
-                        searchingForStartOfData = true;
-                    }
-                } else if (searchingForStartOfData) {
-                    int searchpatternFoundAtIndex = line.indexOf(DATA_START_SEARCHPATTERN);
-
-                    if (searchpatternFoundAtIndex != -1) {
-                        logger.info("found start of data");
-                        theActualData = parseActualData(line);
-                        searchingForStartOfData = false;
-                    }
-                } else {
-                    // throw away the rest
-                }
-
-                line = bufferedReader.readLine();
-            }
-
-            logger.info("Parsing of file completed");
-
-            if (missingValues(username, theActualData)) {
-                logger.error("Parse failed");
-                throw new ValidationException("Filen du försökt importera från innehåller fel");
-            }
-            logger.info("Current username: {}", username);
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            UniqueWardedZones uniqueWardedZones = objectMapper.readValue(theActualData, UniqueWardedZones.class);
-
-            return new WardedDataDTO(uniqueWardedZones, username);
-
+            return parse(bufferedReader);
         } catch (Exception e) {
-            logger.error("oväntat fel i parsning: {}", e);
+            logger.error("oväntat fel i parsning: {}", e, e);
             throw new ValidationException("Filen du försökt importera från innehåller fel", e);
         }
+    }
+
+    WardedDataDTO parse(BufferedReader bufferedReader) throws IOException {
+        String username = null;
+
+        String theActualData = "";
+        boolean searchingForMap = true;
+        boolean searchingForUsername = false;
+        boolean searchingForStartOfData = false;
+        String line = bufferedReader.readLine();
+        while (line != null) {
+            if (searchingForMap) {
+                int searchpatternFoundAtIndex = line.indexOf(MAP_SEARCHPATTERN);
+
+                if (searchpatternFoundAtIndex != -1) {
+                    searchingForMap = false;
+                    searchingForUsername = true;
+                }
+            } else if (searchingForUsername) {
+                int searchpatternFoundAtIndex = line.indexOf(USERNAME_SEARCHPATTERN);
+
+                if (searchpatternFoundAtIndex != -1) {
+                    username = parseUsername(searchpatternFoundAtIndex, line);
+
+                    logger.info("found username {}", username);
+                    searchingForUsername = false;
+                    searchingForStartOfData = true;
+                }
+            } else if (searchingForStartOfData) {
+                int searchpatternFoundAtIndex = line.indexOf(DATA_START_SEARCHPATTERN);
+
+                if (searchpatternFoundAtIndex != -1) {
+                    logger.info("found start of data");
+                    theActualData = parseActualData(line);
+                    searchingForStartOfData = false;
+                }
+            } else {
+                // throw away the rest
+            }
+
+            line = bufferedReader.readLine();
+        }
+
+        logger.info("Parsing of file completed");
+
+        if (missingValues(username, theActualData)) {
+            logger.error("Parse failed");
+            throw new ValidationException("Filen du försökt importera från innehåller fel");
+        }
+        logger.info("Current username: {}", username);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        UniqueWardedZones uniqueWardedZones = objectMapper.readValue(theActualData, UniqueWardedZones.class);
+
+        return new WardedDataDTO(uniqueWardedZones, username);
     }
 
     String parseUsername(int searchpatternFoundAtIndex, String line) {
