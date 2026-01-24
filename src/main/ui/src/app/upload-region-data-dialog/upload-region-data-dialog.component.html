@@ -1,0 +1,20 @@
+<p-dialog [header]="title" [(visible)]="displayDialog" [modal]="true" [style]="{width: '75vw'}" [draggable]="false" [resizable]="false" (onHide)="closeDialog()">
+  <p class="m-0">
+    För att kunna använda denna sida behöver du skapa en användare och importera data för de regioner som du vill söka i. Det gör du på följande vis:
+  </p>
+  <ul>
+    <li>Logga in på warded.se</li>
+    <li>Gå in på sidan "Map of my unique zones"<br><img src="assets/help/linkForMOU.jpg"></li>
+    <li>Välj Global i dropdown för att få med alla regioner<br><img src="assets/help/global.jpg"></li>
+    <li>Högerklicka utanför kartan</li>
+    <li>Välj "Spara som..."<br><img src="assets/help/rightclick.jpg"></li>
+  </ul>
+  <p class="m-0">
+    När du gjort det så klickar du på knappen nedan "Importera" och väljer filen du sparade innan.<br>
+    OBSERVERA att du bör importera en nyligt sparad fil. Alla takes du gör mellan du sparat filen och importerar den kommer att försvinna.
+  </p>
+  <input type="file" accept="text/html" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+  <ng-template pTemplate="footer">
+    <p-button icon="pi pi-check" label="Importera" styleClass="p-button-text" (click)="fileUpload.click()"></p-button>
+  </ng-template>
+</p-dialog>

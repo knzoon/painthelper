@@ -17,13 +17,15 @@ import {CheckboxModule} from 'primeng/checkbox';
 
 import { AppComponent } from './app.component';
 import { ZoneSuggestionsComponent } from './zone-suggestions/zone-suggestions.component';
-import { UploadRegionDataComponent } from './upload-region-data/upload-region-data.component';
+import { UploadRegionDataDialogComponent } from './upload-region-data-dialog/upload-region-data-dialog.component';
+import { HelpDialogComponent } from './help-dialog/help-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ZoneSuggestionsComponent,
-    UploadRegionDataComponent
+    UploadRegionDataDialogComponent,
+    HelpDialogComponent
   ],
   imports: [
     BrowserModule,

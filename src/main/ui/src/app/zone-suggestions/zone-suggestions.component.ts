@@ -12,6 +12,7 @@ import {ImportResult} from "../import-result";
 import {Greeting} from "../greeting";
 import {BroadcastMessage} from "../broadcast-message";
 import {TakesColorDistribution} from "../takes-color-distribution";
+import {FileUploadResult} from "../file-upload-result";
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -391,36 +392,6 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
     this.displayHelpModal = true;
   }
 
-  onFileSelected(event : any) {
-    const file: File = event.target.files[0];
-
-    if (file) {
-      if (file.type === 'text/html') {
-        const formData = new FormData();
-        formData.append("file", file);
-        this.displaySpinner = true;
-        this.zoneService.uploadRegionData(formData).subscribe(
-          (importResult: ImportResult) => {
-            this.displaySpinner = false;
-            const importText = importResult.importType + " Antal zoner: " + importResult.nrofImported;
-            this.messageService.add({severity:'success', summary: 'Lyckad inläsning', detail: importText, life: 15000})
-            if (this.selectedUser) {
-              this.updateRegions(this.selectedUser.username);
-            }
-          },
-          err => {
-            let errorMessage = err.error.message;
-            this.displaySpinner = false;
-            this.messageService.add({severity:'error', summary: 'Dörnöö', detail: errorMessage, life: 15000});
-          });
-        // TODO ta hand om exceptions på ett bra sätt
-      } else {
-        console.info("Du valde fel filtyp");
-      }
-    }
-    this.displayModal = false;
-  }
-
   searchUsers(event: any) {
     this.zoneService.getUsers(event.query).subscribe((users : User[]) => {
       this.suggestedUsers = users;
@@ -512,4 +483,17 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
     return areaLabel.indexOf("(0)") > -1;
   }
 
+  handleDisplaySpinnerChange(displaySpinnerEvent:  boolean) {
+    this.displaySpinner = displaySpinnerEvent;
+  }
+
+  handleUploadResult(uploadResultEvent: FileUploadResult) {
+    let resultInfo = uploadResultEvent.resultInfo;
+    if (uploadResultEvent.resultType === "success") {
+      this.messageService.add({severity:'success', summary: 'Lyckad inläsning', detail: resultInfo, life: 15000})
+      // TODO: Make sure newly imported user is selected, needs change in API to get info about user from backend
+    } else {
+      this.messageService.add({severity:'error', summary: 'Dörnöö', detail: resultInfo, life: 15000});
+    }
+  }
 }
