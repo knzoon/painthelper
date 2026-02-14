@@ -15,6 +15,10 @@
             <p-button icon="pi pi-question" (click)="showHelpModalDialog()"></p-button>
             <app-help-dialog [(displayDialog)]="displayHelpModal"></app-help-dialog>
         </div>
+        <div class="spaced">
+          <p-button icon="pi pi-heart-fill" pTooltip="Visa uppskattning genom en donation" (click)="showDonateDialog()"></p-button>
+          <app-donate-dialog [(displayDialog)]="displayDonateModal"></app-donate-dialog>
+        </div>
       </div>
     </div>
     <div class="user">

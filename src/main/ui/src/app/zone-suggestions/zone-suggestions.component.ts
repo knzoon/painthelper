@@ -40,6 +40,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   displayModal: boolean = false;
 
   displayHelpModal: boolean = false;
+  displayDonateModal: boolean = false;
 
   displaySpinner: boolean = false;
 
@@ -496,4 +497,8 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
       this.messageService.add({severity:'error', summary: 'Dörnöö', detail: resultInfo, life: 15000});
     }
   }
+  showDonateDialog() {
+    this.displayDonateModal = true;
+  }
+
 }

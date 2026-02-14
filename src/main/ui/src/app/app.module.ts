@@ -19,13 +19,15 @@ import { AppComponent } from './app.component';
 import { ZoneSuggestionsComponent } from './zone-suggestions/zone-suggestions.component';
 import { UploadRegionDataDialogComponent } from './upload-region-data-dialog/upload-region-data-dialog.component';
 import { HelpDialogComponent } from './help-dialog/help-dialog.component';
+import { DonateDialogComponent } from './donate-dialog/donate-dialog.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ZoneSuggestionsComponent,
     UploadRegionDataDialogComponent,
-    HelpDialogComponent
+    HelpDialogComponent,
+    DonateDialogComponent
   ],
   imports: [
     BrowserModule,

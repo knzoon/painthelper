@@ -1,0 +1,15 @@
+<p-dialog [header]="title" [(visible)]="displayDialog" [modal]="true" [breakpoints]="{ '1199px': '60vw', '575px': '90vw' }" [style]="{ width: '60vw' }" [draggable]="false" [resizable]="false" (onHide)="closeDialog()">
+  <div class="flex-column">
+    <div class="m-auto pb-3">
+      Jag har byggt dom här sidorna för att underlätta för mig.
+      Om du känner att dessa sidor gör livet bättre även för dig får du gärna bidra med en slant
+      för att avlasta mina löpande kostnader med hyra av serverutrymme och kostnad för domänadress.
+      Det kan ju till och med vara ett sätt att värdera den fritidsarbetstid jag lägger på dessa sidor.
+    </div>
+    <div class="md:w-5 w-full m-auto">
+      <a href="https://app.swish.nu/1/p/sw/?sw=0730214170&amt=25.00&cur=SEK&msg=knzoon&edit=amt&src=qr">
+        <img src="assets/swish-QR-smaller.png" class="max-w-full" />
+      </a>
+    </div>
+  </div>
+</p-dialog>
