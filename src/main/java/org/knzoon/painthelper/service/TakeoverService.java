@@ -16,6 +16,7 @@ import org.knzoon.painthelper.representation.compare.DailyGraphDatasetRepresenta
 import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatapointRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
+import org.knzoon.painthelper.representation.compare.PphDistributionRepresentation;
 import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
 import org.knzoon.painthelper.representation.compare.TakeoverSummaryDayRepresentation;
 import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
@@ -29,11 +30,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -66,7 +65,6 @@ public class TakeoverService {
         User user = userRepository.findByUsername(username);
         Integer roundId = RoundCalculator.roundFromDateTime(ZonedDateTime.now());
         List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
-        List<Route> routes = RouteFactory.from(takeovers);
 
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
         List<Route> filteredRoutes = RouteFactory.from(takeovers)
@@ -83,7 +81,8 @@ public class TakeoverService {
                 takeovers.size(),
                 filteredRoutes.size(),
                 getTakesInRoutes(filteredRoutes),
-                calculatePphForTakeovers(pointsPerDay));
+                calculatePphForTakeovers(pointsPerDay),
+                PphDistributionFactory.create(takeovers));
     }
 
     private String calculateTimeSpentInRoutes(List<Route> routes) {

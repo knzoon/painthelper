@@ -8,8 +8,16 @@ public class TurfEffortRepresentation {
     private final Integer routes;
     private final Integer takesInRoutes;
     private final Integer pointsByPph;
+    private final PphDistributionRepresentation pphDistribution;
 
-    public TurfEffortRepresentation(String username, String timeSpent, Integer points, Integer takes, Integer routes, Integer takesInRoutes, Integer pointsByPph) {
+    public TurfEffortRepresentation(String username,
+                                    String timeSpent,
+                                    Integer points,
+                                    Integer takes,
+                                    Integer routes,
+                                    Integer takesInRoutes,
+                                    Integer pointsByPph,
+                                    PphDistributionRepresentation pphDistribution) {
         this.username = username;
         this.timeSpent = timeSpent;
         this.points = points;
@@ -17,6 +25,7 @@ public class TurfEffortRepresentation {
         this.routes = routes;
         this.takesInRoutes = takesInRoutes;
         this.pointsByPph = pointsByPph;
+        this.pphDistribution = pphDistribution;
     }
 
     public String getTimeSpent() {
@@ -42,5 +51,8 @@ public class TurfEffortRepresentation {
     }
     public Integer getPointsByPph() {
         return pointsByPph;
+    }
+    public PphDistributionRepresentation getPphDistribution() {
+        return pphDistribution;
     }
 }
