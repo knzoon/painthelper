@@ -10,7 +10,10 @@ import java.util.stream.Collectors;
 public class PphDistributionFactory {
     public static PphDistributionRepresentation create(List<Takeover> takeovers) {
         Map<Integer, Long> pphDistribution = takeovers.stream()
-                .collect(Collectors.groupingBy(Takeover::getPph, Collectors.counting()));
+                .map(t -> new MinimalZone(t.getZoneId(), t.getPph()))
+                .collect(Collectors.toSet())
+                .stream()
+                .collect(Collectors.groupingBy(MinimalZone::pph, Collectors.counting()));
 
         return new PphDistributionRepresentation(
                 pphDistribution.getOrDefault(1, 0L).intValue(),
@@ -23,4 +26,6 @@ public class PphDistributionFactory {
                 pphDistribution.getOrDefault(8, 0L).intValue(),
                 pphDistribution.getOrDefault(9, 0L).intValue());
     }
+
+    private record MinimalZone (Long zoneId, Integer pph){}
 }

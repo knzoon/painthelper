@@ -30,6 +30,11 @@ public class TakeoverTestbuilder {
         return new TakeoverTestbuilder();
     }
 
+    public TakeoverTestbuilder withZoneId(Long zoneId) {
+        this.zoneId = zoneId;
+        return this;
+    }
+
     public TakeoverTestbuilder withPph(int pph) {
         this.pph = pph;
         return this;
