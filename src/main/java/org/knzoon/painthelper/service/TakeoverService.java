@@ -11,15 +11,16 @@ import org.knzoon.painthelper.model.User;
 import org.knzoon.painthelper.model.UserRepository;
 import org.knzoon.painthelper.model.Zone;
 import org.knzoon.painthelper.model.ZoneRepository;
+import org.knzoon.painthelper.model.lazy.AverageScoreForZones;
 import org.knzoon.painthelper.representation.LatestTakeoverInfoRepresentation;
 import org.knzoon.painthelper.representation.compare.DailyGraphDatasetRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatapointRepresentation;
 import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
-import org.knzoon.painthelper.representation.compare.PphDistributionRepresentation;
 import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
 import org.knzoon.painthelper.representation.compare.TakeoverSummaryDayRepresentation;
 import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
+import org.knzoon.painthelper.representation.lazy.LazyZoneRepresentation;
 import org.knzoon.painthelper.util.DurationFormatter;
 import org.knzoon.painthelper.util.RoundCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -202,4 +204,11 @@ public class TakeoverService {
     }
 
 
+    @Transactional
+    public List<LazyZoneRepresentation> getZonesWithScoreAverage() {
+        List<Takeover> takeovers = List.of();
+        Set<Zone> zones = Set.of();
+        AverageScoreForZones averageScoreForZones = new AverageScoreForZones(takeovers, zones);
+        return averageScoreForZones.getZonesWithAverageScore(ZonedDateTime.now());
+    }
 }

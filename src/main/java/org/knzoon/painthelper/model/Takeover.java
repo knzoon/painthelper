@@ -220,7 +220,7 @@ public class Takeover {
 
     }
 
-    boolean isNeutralZone() {
+    public boolean isNeutralZone() {
         return previousUser == null;
     }
 

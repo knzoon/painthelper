@@ -40,6 +40,32 @@ public class TakeoverTestbuilder {
         return this;
     }
 
+    public TakeoverTestbuilder withTakeoverTime(ZonedDateTime takeoverTime) {
+        this.takeoverTime = takeoverTime;
+        return this;
+    }
+
+    public TakeoverTestbuilder withUser(User user) {
+        this.user = user;
+        return this;
+    }
+
+    public TakeoverTestbuilder withTp(Integer tp) {
+        this.tp = tp;
+        return this;
+    }
+
+    public TakeoverTestbuilder withPreviousUser(User previousUser) {
+        this.previousUser = previousUser;
+        return this;
+    }
+
+    public TakeoverTestbuilder withNextInfo(User nextUser, ZonedDateTime lostTime) {
+        this.nextUser = nextUser;
+        this.lostTime = lostTime;
+        return this;
+    }
+
     public Takeover build() {
         Takeover takeover = new Takeover(roundId, type, zoneId, zonetype, takeoverTime, user, pph, tp, previousUser, assistingUser);
         if (lostTime != null) {
