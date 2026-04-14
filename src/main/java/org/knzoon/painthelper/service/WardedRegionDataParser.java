@@ -18,8 +18,7 @@ import java.nio.charset.StandardCharsets;
 public class WardedRegionDataParser {
 
     Logger logger = LoggerFactory.getLogger(WardedRegionDataParser.class);
-    private final static String ME_SEARCHPATTERN = "<button class=\"dropbtn\">Me";
-    private final static String USERNAME_SEARCHPATTERN = "<button class=\"dropbtn\">";
+    private final static String USERNAME_SEARCHPATTERN = "class=\"more-group-label no-toggle\">";
     private final static String DATA_START_SEARCHPATTERN = "\"type\":\"FeatureCollection\"";
     private final static String PRE_ACTUAL_DATA = "unique\":{\"type\":\"geojson\",\"data\":";
     private final static String POST_ACTUAL_DATA = "}}]}";
@@ -38,19 +37,11 @@ public class WardedRegionDataParser {
         String username = null;
 
         String theActualData = "";
-        boolean searchingForMe = true;
-        boolean searchingForUsername = false;
+        boolean searchingForUsername = true;
         boolean searchingForStartOfData = false;
         String line = bufferedReader.readLine();
         while (line != null) {
-            if (searchingForMe) {
-                int searchpatternFoundAtIndex = line.indexOf(ME_SEARCHPATTERN);
-
-                if (searchpatternFoundAtIndex != -1) {
-                    searchingForMe = false;
-                    searchingForUsername = true;
-                }
-            } else if (searchingForUsername) {
+            if (searchingForUsername) {
                 int searchpatternFoundAtIndex = line.indexOf(USERNAME_SEARCHPATTERN);
 
                 if (searchpatternFoundAtIndex != -1) {
