@@ -17,6 +17,27 @@ class PphDistributionFactoryTest {
 
     @Test
     public void canCreatePphDistribution() {
+        List<Takeover> takeovers = getTakeovers();
+        PphDistributionRepresentation pphDistribution = PphDistributionFactory.createForUniqueZones(takeovers);
+        assertThat(pphDistribution).isNotNull();
+        assertThat(pphDistribution.getPlusOne()).isEqualTo(1);
+        assertThat(pphDistribution.getPlusSix()).isEqualTo(2);
+        assertThat(pphDistribution.getPlusNine()).isEqualTo(1);
+        assertThat(pphDistribution.getPlusEight()).isEqualTo(0);
+    }
+
+    @Test
+    public void canCreatePphDistributionForAllTakeovers() {
+        List<Takeover> takeovers = getTakeovers();
+        PphDistributionRepresentation pphDistribution = PphDistributionFactory.createForAllTakeovers(takeovers);
+        assertThat(pphDistribution).isNotNull();
+        assertThat(pphDistribution.getPlusOne()).isEqualTo(1);
+        assertThat(pphDistribution.getPlusSix()).isEqualTo(2);
+        assertThat(pphDistribution.getPlusNine()).isEqualTo(2);
+        assertThat(pphDistribution.getPlusEight()).isEqualTo(0);
+    }
+
+    private List<Takeover> getTakeovers() {
         Takeover takeoverWithPphOne = TakeoverTestbuilder.builder().withPph(1).build();
         Takeover takeoverWithPphSix = TakeoverTestbuilder.builder().withZoneId(ZONE_ONE).withPph(6).build();
         Takeover anotherTakeoverWithPphSixOnAnotherZone = TakeoverTestbuilder.builder().withZoneId(ZONE_TWO).withPph(6).build();
@@ -28,12 +49,7 @@ class PphDistributionFactoryTest {
                 anotherTakeoverWithPphSixOnAnotherZone,
                 takeoverWithPphNine,
                 anotherTakeoverWithPphNine);
-        PphDistributionRepresentation pphDistribution = PphDistributionFactory.create(takeovers);
-        assertThat(pphDistribution).isNotNull();
-        assertThat(pphDistribution.getPlusOne()).isEqualTo(1);
-        assertThat(pphDistribution.getPlusSix()).isEqualTo(2);
-        assertThat(pphDistribution.getPlusNine()).isEqualTo(1);
-        assertThat(pphDistribution.getPlusEight()).isEqualTo(0);
+        return takeovers;
     }
 
 }

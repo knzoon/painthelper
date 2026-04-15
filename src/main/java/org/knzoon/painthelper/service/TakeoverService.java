@@ -84,7 +84,8 @@ public class TakeoverService {
                 filteredRoutes.size(),
                 getTakesInRoutes(filteredRoutes),
                 calculatePphForTakeovers(pointsPerDay),
-                PphDistributionFactory.create(takeovers));
+                PphDistributionFactory.createForUniqueZones(takeovers),
+                PphDistributionFactory.createForAllTakeovers(takeovers));
     }
 
     private String calculateTimeSpentInRoutes(List<Route> routes) {
