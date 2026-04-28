@@ -31,6 +31,7 @@ target/
 /run_newly_build.sh
 /release_me.sh
 /deploy_frontend_to_test.sh
+.github/
 
 ### Angular ####
 src/main/ui/dist/

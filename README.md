@@ -1,6 +1,8 @@
 # painthelper
 Source code for the web app Painthelper
 
+Consists of a java backend and an Angular frontend
+
 ## Build and deploy
 
 ### Environment variables
