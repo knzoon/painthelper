@@ -3,6 +3,8 @@ Source code for the web app Painthelper
 
 Consists of a java backend and an Angular frontend
 
+Backend root is repository root
+
 Angular root is located at ``` src/main/ui/ ```
 
 ## Build and deploy
