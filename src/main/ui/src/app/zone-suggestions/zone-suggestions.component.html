@@ -29,7 +29,13 @@
           <i class="pi pi-user"></i>&nbsp;
           <p-autoComplete [(ngModel)]="selectedUser" [showEmptyMessage]="true" emptyMessage="Ingen användare hittad" [suggestions]="suggestedUsers" (completeMethod)="searchUsers($event)" field="username" [minLength]="1" [size]="6" (onSelect)="userChanged($event)"></p-autoComplete>
           <div *ngIf="errorFindingUser == undefined" class="spaced">
-            <p-dropdown [options]="regionTakes" [(ngModel)]="selectedRegion" placeholder="Välj region" optionLabel="regionName" (onChange)="chooseRegion()" ></p-dropdown>
+            <p-dropdown [options]="regionTakes" [(ngModel)]="selectedRegion" placeholder="Välj region" optionLabel="regionName" (onChange)="chooseRegion()" >
+              <ng-template let-region pTemplate="item">
+                <div>
+                  {{ showRegionDropdownItem(region) }}
+                </div>
+              </ng-template>
+            </p-dropdown>
           </div>
       </div>
     </div>

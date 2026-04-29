@@ -501,4 +501,12 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
     this.displayDonateModal = true;
   }
 
+  showRegionDropdownItem(item: RegionTakes) : string {
+    return item.regionName + " (" + this.sumColorDistribution(item.takesColorDistribution) + ")";
+  }
+
+  sumColorDistribution(distribution: TakesColorDistribution) : number {
+    return distribution.green + distribution.yellow + distribution.orange + distribution.red + distribution.purple;
+  }
+
 }
