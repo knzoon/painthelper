@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class PanToCalculator {
 
     public Point panTo(List<UniqueZoneRepresentation> zonesWithTakes) {
-        Double averageLatitude = averageDoubleValue(zonesWithTakes.stream().map(UniqueZoneRepresentation::getLatitude).collect(Collectors.toList()));
-        Double averageLongitude = averageDoubleValue(zonesWithTakes.stream().map(UniqueZoneRepresentation::getLongitude).collect(Collectors.toList()));
+        Double averageLatitude = averageDoubleValue(zonesWithTakes.stream().map(UniqueZoneRepresentation::latitude).collect(Collectors.toList()));
+        Double averageLongitude = averageDoubleValue(zonesWithTakes.stream().map(UniqueZoneRepresentation::longitude).collect(Collectors.toList()));
         return new Point(averageLatitude, averageLongitude);
     }
 

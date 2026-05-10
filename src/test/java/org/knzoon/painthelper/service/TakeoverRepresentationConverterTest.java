@@ -28,7 +28,7 @@ class TakeoverRepresentationConverterTest {
         Takeover takeover = new Takeover(185, TakeoverType.TAKEOVER, 42l, "Bridge", now.minusHours(1), user, 7, 95, null, null);
         Map<Long, Zone> zoneMap = new HashMap<>();
         TakeoverRepresentation representation = converter.toRepresentation(takeover, now, zoneMap);
-        assertThat(representation.getActivity()).isEqualTo("TAKEOVER");
+        assertThat(representation.activity()).isEqualTo("TAKEOVER");
     }
 
     @Test
@@ -39,7 +39,7 @@ class TakeoverRepresentationConverterTest {
         Takeover takeover = new Takeover(185, TakeoverType.ASSIST, 42l, "Bridge", now.minusHours(1), user, 7, 95, null, assistingUser);
         Map<Long, Zone> zoneMap = new HashMap<>();
         TakeoverRepresentation representation = converter.toRepresentation(takeover, now, zoneMap);
-        assertThat(representation.getActivity()).isEqualTo("ASSIST");
+        assertThat(representation.activity()).isEqualTo("ASSIST");
     }
 
     @Test
@@ -49,6 +49,6 @@ class TakeoverRepresentationConverterTest {
         Takeover takeover = new Takeover(185, TakeoverType.TAKEOVER, 42l, "Bridge", now.minusHours(1), user, 7, 95, user, null);
         Map<Long, Zone> zoneMap = new HashMap<>();
         TakeoverRepresentation representation = converter.toRepresentation(takeover, now, zoneMap);
-        assertThat(representation.getActivity()).isEqualTo("REVISIT");
+        assertThat(representation.activity()).isEqualTo("REVISIT");
     }
 }

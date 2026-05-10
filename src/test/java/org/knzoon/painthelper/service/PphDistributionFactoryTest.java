@@ -20,10 +20,10 @@ class PphDistributionFactoryTest {
         List<Takeover> takeovers = getTakeovers();
         PphDistributionRepresentation pphDistribution = PphDistributionFactory.createForUniqueZones(takeovers);
         assertThat(pphDistribution).isNotNull();
-        assertThat(pphDistribution.getPlusOne()).isEqualTo(1);
-        assertThat(pphDistribution.getPlusSix()).isEqualTo(2);
-        assertThat(pphDistribution.getPlusNine()).isEqualTo(1);
-        assertThat(pphDistribution.getPlusEight()).isEqualTo(0);
+        assertThat(pphDistribution.plusOne()).isEqualTo(1);
+        assertThat(pphDistribution.plusSix()).isEqualTo(2);
+        assertThat(pphDistribution.plusNine()).isEqualTo(1);
+        assertThat(pphDistribution.plusEight()).isEqualTo(0);
     }
 
     @Test
@@ -31,10 +31,10 @@ class PphDistributionFactoryTest {
         List<Takeover> takeovers = getTakeovers();
         PphDistributionRepresentation pphDistribution = PphDistributionFactory.createForAllTakeovers(takeovers);
         assertThat(pphDistribution).isNotNull();
-        assertThat(pphDistribution.getPlusOne()).isEqualTo(1);
-        assertThat(pphDistribution.getPlusSix()).isEqualTo(2);
-        assertThat(pphDistribution.getPlusNine()).isEqualTo(2);
-        assertThat(pphDistribution.getPlusEight()).isEqualTo(0);
+        assertThat(pphDistribution.plusOne()).isEqualTo(1);
+        assertThat(pphDistribution.plusSix()).isEqualTo(2);
+        assertThat(pphDistribution.plusNine()).isEqualTo(2);
+        assertThat(pphDistribution.plusEight()).isEqualTo(0);
     }
 
     private List<Takeover> getTakeovers() {
