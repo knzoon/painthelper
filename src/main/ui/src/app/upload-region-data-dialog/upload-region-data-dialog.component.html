@@ -1,16 +1,29 @@
-<p-dialog [header]="title" [(visible)]="displayDialog" [modal]="true" [style]="{width: '75vw'}" [draggable]="false" [resizable]="false" (onHide)="closeDialog()">
+<p-dialog [header]="title" [(visible)]="displayDialog" [modal]="true" [style]="{width: '50vw'}" [draggable]="false" [resizable]="false" (onHide)="closeDialog()">
   <p class="m-0">
-    För att kunna använda denna sida behöver du skapa en användare och importera data för de regioner som du vill söka i. Det gör du på följande vis:
+    För att kunna använda Painthelper behöver du importera data för de regioner du tagit zoner i.
+    Denna import behöver bara göras en gång, sen kommer Painthelper hålla koll på dina tagningar.
   </p>
+  <p>
+    Det går tyvärr inte på ett enkelt sätt göra denna import från en mobiltelefon/platta utan du får gå in på denna sida från en dator.
+    Bilderna i denna hjälp är tagna från Chrome men det kan fungera med andra browsers också.
+  </p>
+  <p>
+    Själva importen är en tvåstegs-raket som beskrivs nedan.
+  </p>
+  <h1>Skapa fil att importera</h1>
   <ul>
-    <li>Logga in på warded.se</li>
-    <li>Gå in på sidan "Map of my unique zones"<br><img src="assets/help/linkForMOU.jpg"></li>
-    <li>Välj Global i dropdown för att få med alla regioner<br><img src="assets/help/global.jpg"></li>
+    <li>Logga in på https://turfa.nu/</li>
+    <li>Gå in på sidan "Map of my unique zones"<br><img src="assets/help/linkForMOU.png"></li>
+    <li>Välj Global i dropdown för att få med alla regioner<br><img src="assets/help/global.png"></li>
     <li>Högerklicka utanför kartan</li>
-    <li>Välj "Spara som..."<br><img src="assets/help/rightclick.jpg"></li>
+    <li>Välj "Spara som..."<br><img src="assets/help/rightclick.png"></li>
   </ul>
+  <h1>Importera skapad fil</h1>
   <p class="m-0">
     När du gjort det så klickar du på knappen nedan "Importera" och väljer filen du sparade innan.<br>
+    <img src="assets/help/import.png">
+  </p>
+  <p>
     OBSERVERA att du bör importera en nyligt sparad fil. Alla takes du gör mellan du sparat filen och importerar den kommer att försvinna.
   </p>
   <input type="file" accept="text/html" class="file-input" (change)="onFileSelected($event)" #fileUpload>
