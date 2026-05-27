@@ -98,8 +98,6 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   ngOnInit(): void {
     this.testingPopulatingUser();
     this.populatingSearchRoundOnlyFromLocalstorage()
-    this.testingPopulatingRegion();
-    this.testingPopulatingArea();
     this.populatingMinTakesFromLocalstorage();
     this.populatingMaxTakesFromLocalstorage();
   }
@@ -272,6 +270,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
         this.regionTakesId = 0;
       } else {
         this.errorFindingUser = undefined;
+        this.testingPopulatingRegion();
       }
     });
   }
@@ -289,6 +288,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   private populateAreaSelect() {
     this.zoneService.getAreas(this.regionTakesId).subscribe((areas : Area[]) => {
       this.areas = areas;
+      this.testingPopulatingArea();
     });
   }
 
@@ -303,9 +303,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   }
 
   private populateColorboxesForArea() {
-    console.info('populateColorboxesForArea');
     if (this.selectedArea) {
-      console.info('searchRoundOnly: ' + this.searchRoundOnly);
       let colorDistribution = this.searchRoundOnly ? this.selectedArea.roundColorDistribution : this.selectedArea.takesColorDistribution;
       let totalAmount = this.totalAmountFromDifferentColors(colorDistribution);
       this.populateColorboxes(colorDistribution, totalAmount);
@@ -349,7 +347,6 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
       this.regionTakesId = this.selectedRegion.id;
       this.selectedArea = undefined;
-      // console.info("RegionTakesId: " + this.selectedRegion.id);
       this.populateColorboxesForRegion();
       this.populateAreaSelect();
     } else {
@@ -417,11 +414,10 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   testingPopulatingRegion() {
     const jsonStringFromStorage = localStorage.getItem(this.lsRegionKey);
-  //  console.info('region jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let region : RegionTakes = JSON.parse(jsonStringFromStorage);
-      this.selectedRegion = region;
+      this.selectedRegion = this.regionTakes.find(r => r.id === region.id);
       this.chooseRegion();
     }
 
@@ -429,11 +425,10 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   testingPopulatingArea() {
     const jsonStringFromStorage = localStorage.getItem(this.lsAreaKey);
-  //  console.info('area jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let area : Area = JSON.parse(jsonStringFromStorage);
-      this.selectedArea = area;
+      this.selectedArea = this.areas.find(a => a.id === area.id);
       this.chooseArea();
     }
 
@@ -459,7 +454,6 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
 
   populatingSearchRoundOnlyFromLocalstorage() {
     const jsonStringFromStorage = localStorage.getItem(this.lsSearchRoundOnly);
-//    console.info('searchRoundOnly jsonString from storage:' + jsonStringFromStorage);
 
     if (jsonStringFromStorage) {
       let searchRoundOnly: boolean = JSON.parse(jsonStringFromStorage);
