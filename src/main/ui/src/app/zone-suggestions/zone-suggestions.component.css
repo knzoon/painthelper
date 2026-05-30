@@ -69,16 +69,18 @@
 }
 
 .head1 {
-  width: 120px;
-  min-width: 120px;
+  width: 40%;
+  min-width: 140px;
+  max-width: 240px;
   font-weight: bold;
   margin-bottom: 4px;
   /*background: sandybrown;*/
 }
 
 .head2 {
-  width: 140px;
+  width: 40%;
   min-width: 140px;
+  max-width: 240px;
   font-weight: bold;
   margin-bottom: 4px;
   /*background: saddlebrown;*/
@@ -93,16 +95,18 @@
 }
 
 .col1 {
-  width: 120px;
-  min-width: 120px;
+  width: 40%;
+  min-width: 140px;
+  max-width: 240px;
   overflow: hidden;
   margin: 1px 0px;
   /*background: sandybrown;*/
 }
 
 .col2 {
-  width: 140px;
+  width: 40%;
   min-width: 140px;
+  max-width: 240px;
   overflow: hidden;
   margin: 1px 0px;
   /*background: saddlebrown;*/

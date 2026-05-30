@@ -110,14 +110,14 @@
         <div class="redbox"><span class="font-bold">{{redbox}}</span> {{redboxPercent}}</div>
         <div class="purplebox"><span class="font-bold">{{purplebox}}</span> {{purpleboxPercent}}</div>
       </div>
-      <div class="tableHeader text-sm">
+      <div class="tableHeader">
         <div class="row">
           <div class="head1">Zonnamn</div>
           <div class="head2">Area</div>
           <div class="head3">Tagit</div>
         </div>
       </div>
-      <div class="table text-sm">
+      <div class="table">
         <div class="row" *ngFor="let zone of zones">
           <div class="col1" (click)="zoneInListSelected(zone)">{{zone.zoneName}}</div>
           <div class="col2" (click)="zoneInListSelected(zone)">{{zone.areaName}}</div>
