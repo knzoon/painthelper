@@ -1,10 +1,10 @@
 package org.knzoon.painthelper.service.ride;
 
+import org.knzoon.painthelper.model.UserIdView;
 import org.knzoon.painthelper.model.ride.RideBetweenZones;
 import org.knzoon.painthelper.model.ride.RideBetweenZonesRepository;
 import org.knzoon.painthelper.model.ride.TakeoverRideView;
 import org.knzoon.painthelper.representation.ride.CreateRidesResult;
-import org.knzoon.painthelper.service.ZoneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +30,13 @@ public class RideService {
     }
 
     @Transactional
-    public CreateRidesResult createRidesForRoundAndArea(int roundId, Long userId, Long areaId) {
-        logger.info("Starting creation of rides");
+    public List<UserIdView> getDistinctUsersForRoundAndArea(int roundId, Long areaId) {
+        return rideBetweenZonesRepository.findDistinctUsersForRoundAndArea(roundId, areaId);
+    }
+
+    @Transactional
+    public CreateRidesResult createRidesForRoundUserAndArea(int roundId, Long userId, Long areaId) {
+        logger.info("Starting creation of rides for roundId {}, userId {} areaId {}", roundId, userId, areaId);
         List<TakeoverRideView> takeovers = rideBetweenZonesRepository.findTakeoversByRoundUserArea(roundId, userId, areaId);
         List<RideBetweenZones> ridesBetweenZones = extractRidesBetweenZones(takeovers, roundId);
         rideBetweenZonesRepository.saveAll(ridesBetweenZones);
