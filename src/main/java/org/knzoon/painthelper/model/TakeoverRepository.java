@@ -36,4 +36,7 @@ public interface TakeoverRepository extends JpaRepository<Takeover, Long> {
     @Query(value = "SELECT * FROM takeover ORDER BY id desc limit 1", nativeQuery = true)
     Takeover findLatestTakeover();
 
+    @Query(value = "SELECT t.* FROM takeover t INNER JOIN `user` u on u.id = t.user_id WHERE round_id = :roundId and t.zone_id = :zoneId order by t.id desc", nativeQuery = true)
+    List<Takeover> findforRoundAndZone(@Param("roundId") Integer roundId, @Param("zoneId") Long zoneId);
+
 }

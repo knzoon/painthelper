@@ -5,11 +5,11 @@ import org.knzoon.painthelper.model.Route;
 import org.knzoon.painthelper.model.Takeover;
 import org.knzoon.painthelper.model.Zone;
 import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
+import org.knzoon.painthelper.representation.compare.ZoneTakeoverRepresentation;
 import org.knzoon.painthelper.util.DurationFormatter;
 import org.knzoon.painthelper.util.UTCSwedishTimeConverter;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,7 +35,7 @@ public class TakeoverRepresentationConverter {
         PointsInDay pointsUntilNow = takeover.pointsUntilNow(now);
         Optional<Zone> zone = Optional.ofNullable(zoneMap.get(takeover.getZoneId()));
         var builder = TakeoverRepresentation.builder();
-        builder.withTakeoverTime(UTCSwedishTimeConverter.convert(takeover.getTakeoverTime()).format(DateTimeFormatter.ofPattern("HH:mm:ss")))
+        builder.withTakeoverTime(takeovetimeConverter(takeover.getTakeoverTime()))
                 .withTp(takeover.getTp())
                 .withPph(takeover.getPph())
                 .withActivity(takeover.activity())
@@ -51,4 +51,21 @@ public class TakeoverRepresentationConverter {
         return builder.build();
     }
 
+    private String takeovetimeConverter(ZonedDateTime takeovertime) {
+        return UTCSwedishTimeConverter.convert(takeovertime).format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+    }
+
+    private String takeovetimeWithDateConverter(ZonedDateTime takeovertime) {
+        return UTCSwedishTimeConverter.convert(takeovertime).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    ZoneTakeoverRepresentation toZoneTakeoverRepresentation(Takeover takeover, ZonedDateTime now) {
+        PointsInDay pointsUntilNow = takeover.pointsUntilNow(now);
+
+        return new ZoneTakeoverRepresentation(
+                takeovetimeWithDateConverter(takeover.getTakeoverTime()),
+                takeover.getUser().getUsername(),
+                pointsUntilNow.getTotalRounded(),
+                DurationFormatter.format(pointsUntilNow.getDuration()));
+    }
 }

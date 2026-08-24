@@ -13,13 +13,7 @@ import org.knzoon.painthelper.model.Zone;
 import org.knzoon.painthelper.model.ZoneRepository;
 import org.knzoon.painthelper.model.lazy.AverageScoreForZones;
 import org.knzoon.painthelper.representation.LatestTakeoverInfoRepresentation;
-import org.knzoon.painthelper.representation.compare.DailyGraphDatasetRepresentation;
-import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
-import org.knzoon.painthelper.representation.compare.GraphDatapointRepresentation;
-import org.knzoon.painthelper.representation.compare.GraphDatasetRepresentation;
-import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
-import org.knzoon.painthelper.representation.compare.TakeoverSummaryDayRepresentation;
-import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
+import org.knzoon.painthelper.representation.compare.*;
 import org.knzoon.painthelper.representation.lazy.LazyZoneRepresentation;
 import org.knzoon.painthelper.util.DurationFormatter;
 import org.knzoon.painthelper.util.RoundCalculator;
@@ -212,4 +206,29 @@ public class TakeoverService {
         AverageScoreForZones averageScoreForZones = new AverageScoreForZones(takeovers, zones);
         return averageScoreForZones.getZonesWithAverageScore(ZonedDateTime.now());
     }
+
+    @Transactional
+    public ZoneTakeoverSummaryRepresentation getZoneTakeoverSummary(String zonename) {
+        List<Zone> zones = zoneRepository.findByNameIn(Set.of(zonename));
+
+        if (zones.size() != 1) {
+            return null;
+        }
+
+        Zone zone = zones.getFirst();
+        ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
+        Integer roundId = RoundCalculator.roundFromDateTime(now);
+
+        List<Takeover> takeovers = takeoverRepository.findforRoundAndZone(roundId, zone.getId());
+
+        List<ZoneTakeoverRepresentation> takeoverRepresentations = takeovers.stream()
+                .map(takeover -> takeoverRepresentationConverter.toZoneTakeoverRepresentation(takeover, now))
+                .toList();
+
+        int tp = takeovers.isEmpty() ? 0 : takeovers.getFirst().getTp();
+        int pph = takeovers.isEmpty() ? 0 : takeovers.getFirst().getPph();
+
+        return new ZoneTakeoverSummaryRepresentation(zonename, zone.getAreaName(), tp, pph, takeoverRepresentations);
+    }
+
 }
