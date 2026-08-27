@@ -44,6 +44,7 @@ public class TakeoverRepresentationConverter {
                 .withAccumulating(pointsUntilNow.hasAccumulatingPph());
         zone.ifPresent(z -> builder.withZoneName(z.getName()));
         zone.ifPresent(z -> Optional.ofNullable(z.getAreaName()).ifPresent(builder::withAreaName));
+        zone.ifPresent(z -> Optional.ofNullable(z.getAreaId()).ifPresent(builder::withAreaId));
         takeover.previousUser().ifPresent(user -> builder.withPreviousUser(user.getUsername()));
         takeover.nextUser().ifPresent(user -> builder.withNextUser(user.getUsername()));
         takeover.assistingUser().ifPresent(user -> builder.withAssistingUser(user.getUsername()));

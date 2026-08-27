@@ -1,16 +1,6 @@
 package org.knzoon.painthelper.service;
 
-import org.knzoon.painthelper.model.PointsInDay;
-import org.knzoon.painthelper.model.PointsInRound;
-import org.knzoon.painthelper.model.Route;
-import org.knzoon.painthelper.model.RouteFactory;
-import org.knzoon.painthelper.model.Takeover;
-import org.knzoon.painthelper.model.TakeoverRepository;
-import org.knzoon.painthelper.model.TakeoversInRound;
-import org.knzoon.painthelper.model.User;
-import org.knzoon.painthelper.model.UserRepository;
-import org.knzoon.painthelper.model.Zone;
-import org.knzoon.painthelper.model.ZoneRepository;
+import org.knzoon.painthelper.model.*;
 import org.knzoon.painthelper.model.lazy.AverageScoreForZones;
 import org.knzoon.painthelper.representation.LatestTakeoverInfoRepresentation;
 import org.knzoon.painthelper.representation.compare.*;
@@ -231,4 +221,27 @@ public class TakeoverService {
         return new ZoneTakeoverSummaryRepresentation(zonename, zone.getAreaName(), tp, pph, takeoverRepresentations);
     }
 
+    @Transactional
+    public ToplistUniqueZonesInAreaRepresentation getToplistUniqueZonesInArea(Long areaId) {
+        List<AreaView> areas = zoneRepository.findAreaById(areaId);
+
+        if (areas.isEmpty()) {
+            return new ToplistUniqueZonesInAreaRepresentation("Zone is missing", 0, List.of());
+        }
+
+        Integer nrofZones = Math.toIntExact(zoneRepository.countByAreaId(areaId));
+        String areaName = areas.getFirst().getArea();
+
+        ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
+        Integer roundId = RoundCalculator.roundFromDateTime(now);
+        List<NumberOfUniqueZonesForUserRepresentation> users = takeoverRepository.findForRoundAndArea(roundId, areaId).stream()
+                .map(u -> tillRepresentation(u))
+                .toList();
+
+        return new ToplistUniqueZonesInAreaRepresentation(areaName, nrofZones, users);
+    }
+
+    private NumberOfUniqueZonesForUserRepresentation tillRepresentation(UserUniqueZonesView user) {
+        return new NumberOfUniqueZonesForUserRepresentation(user.getUsername(), user.getNrof());
+    }
 }

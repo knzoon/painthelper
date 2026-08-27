@@ -39,4 +39,7 @@ public interface TakeoverRepository extends JpaRepository<Takeover, Long> {
     @Query(value = "SELECT t.* FROM takeover t INNER JOIN `user` u on u.id = t.user_id WHERE round_id = :roundId and t.zone_id = :zoneId order by t.id desc", nativeQuery = true)
     List<Takeover> findforRoundAndZone(@Param("roundId") Integer roundId, @Param("zoneId") Long zoneId);
 
+    @Query(value = "with apa as (select t.user_id, z.name, 1 as one from takeover t inner join `zone` z on t.zone_id = z.id WHERE t.round_id = :roundId and z.area_id = :areaId group by t.user_id, z.name) select u.username, sum(apa.one) as nrof from apa inner join `user` u on u.id = apa.user_id group by u.username order by nrof desc", nativeQuery = true)
+    List<UserUniqueZonesView> findForRoundAndArea(@Param("roundId") Integer roundId, @Param("areaId") Long areaId);
+
 }

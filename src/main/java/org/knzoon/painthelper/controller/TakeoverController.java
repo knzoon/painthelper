@@ -1,10 +1,7 @@
 package org.knzoon.painthelper.controller;
 
 import org.knzoon.painthelper.representation.LatestTakeoverInfoRepresentation;
-import org.knzoon.painthelper.representation.compare.GraphDataRepresentation;
-import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
-import org.knzoon.painthelper.representation.compare.TurfEffortRepresentation;
-import org.knzoon.painthelper.representation.compare.ZoneTakeoverSummaryRepresentation;
+import org.knzoon.painthelper.representation.compare.*;
 import org.knzoon.painthelper.representation.lazy.LazyZoneRepresentation;
 import org.knzoon.painthelper.service.TakeoverService;
 import org.slf4j.Logger;
@@ -64,4 +61,11 @@ public class TakeoverController {
     public ZoneTakeoverSummaryRepresentation getZoneTakeoverSummary(@PathVariable(value = "zonename") String zonename) {
         return takeoverService.getZoneTakeoverSummary(zonename);
     }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/api/takeover/area/{areaId}")
+    public ToplistUniqueZonesInAreaRepresentation getToplistUniqueZonesInArea(@PathVariable(value = "areaId") Long areaId) {
+        return takeoverService.getToplistUniqueZonesInArea(areaId);
+    }
+
 }

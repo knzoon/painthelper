@@ -4,6 +4,7 @@ public record TakeoverRepresentation(
     String takeoverTime,
     String zoneName,
     String areaName,
+    Long areaId,
     Integer tp,
     Integer pph,
     String activity,

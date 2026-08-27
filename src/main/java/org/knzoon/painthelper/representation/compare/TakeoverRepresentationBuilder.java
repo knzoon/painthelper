@@ -4,6 +4,7 @@ public class TakeoverRepresentationBuilder {
     private String takeoverTime;
     private String zoneName;
     private String areaName;
+    private Long areaId;
     private Integer tp;
     private Integer pph = 0;
     private String activity;
@@ -26,6 +27,11 @@ public class TakeoverRepresentationBuilder {
 
     public TakeoverRepresentationBuilder withAreaName(String areaName) {
         this.areaName = areaName;
+        return this;
+    }
+
+    public TakeoverRepresentationBuilder withAreaId(Long areaId) {
+        this.areaId = areaId;
         return this;
     }
 
@@ -76,7 +82,7 @@ public class TakeoverRepresentationBuilder {
 
 
     public TakeoverRepresentation build() {
-        return new TakeoverRepresentation(takeoverTime, zoneName, areaName, tp, pph, activity, points, duration, previousUser, nextUser, assistingUser, accumulating);
+        return new TakeoverRepresentation(takeoverTime, zoneName, areaName, areaId, tp, pph, activity, points, duration, previousUser, nextUser, assistingUser, accumulating);
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -31,6 +32,11 @@ public interface ZoneRepository extends JpaRepository<Zone, Long> {
 
     @Query(value = "select distinct z.area_id as areaId, z.area_name as area, 0 as antal from `zone` z where z.region_id = :regionId order by z.area_name", nativeQuery = true)
     List<AreaView> findDistinctAreasByRegionId(Long regionId);
+
+    @Query(value = "select distinct z.area_id as areaId, z.area_name as area, 1 as antal from `zone` z where z.area_id = :areaId", nativeQuery = true)
+    List<AreaView> findAreaById(Long areaId);
+
+    Long countByAreaId(Long areaId);
 
     List<Zone> findByNameIn(Set<String> zonenames);
 
