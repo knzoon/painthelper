@@ -57,9 +57,9 @@ public class TakeoverController {
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
-    @GetMapping("/api/takeover/zone/{zonename}")
-    public ZoneTakeoverSummaryRepresentation getZoneTakeoverSummary(@PathVariable(value = "zonename") String zonename) {
-        return takeoverService.getZoneTakeoverSummary(zonename);
+    @GetMapping("/api/takeover/zone/{zoneId}")
+    public ZoneTakeoverSummaryRepresentation getZoneTakeoverSummary(@PathVariable(value = "zoneId") Long zoneId) {
+        return takeoverService.getZoneTakeoverSummary(zoneId);
     }
 
     @CrossOrigin(origins = "http://localhost:4200")

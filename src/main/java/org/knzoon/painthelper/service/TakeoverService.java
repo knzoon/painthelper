@@ -15,10 +15,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -198,18 +195,19 @@ public class TakeoverService {
     }
 
     @Transactional
-    public ZoneTakeoverSummaryRepresentation getZoneTakeoverSummary(String zonename) {
-        List<Zone> zones = zoneRepository.findByNameIn(Set.of(zonename));
+    public ZoneTakeoverSummaryRepresentation getZoneTakeoverSummary(Long zoneId) {
+        Optional<Zone> foundZone = zoneRepository.findById(zoneId);
 
-        if (zones.size() != 1) {
+        if (foundZone.isEmpty()) {
             return null;
         }
 
-        Zone zone = zones.getFirst();
+        Zone zone = foundZone.get();
+
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
         Integer roundId = RoundCalculator.roundFromDateTime(now);
 
-        List<Takeover> takeovers = takeoverRepository.findforRoundAndZone(roundId, zone.getId());
+        List<Takeover> takeovers = takeoverRepository.findforRoundAndZone(roundId, zoneId);
 
         List<ZoneTakeoverRepresentation> takeoverRepresentations = takeovers.stream()
                 .map(takeover -> takeoverRepresentationConverter.toZoneTakeoverRepresentation(takeover, now))
@@ -218,7 +216,7 @@ public class TakeoverService {
         int tp = takeovers.isEmpty() ? 0 : takeovers.getFirst().getTp();
         int pph = takeovers.isEmpty() ? 0 : takeovers.getFirst().getPph();
 
-        return new ZoneTakeoverSummaryRepresentation(zonename, zone.getAreaName(), tp, pph, takeoverRepresentations);
+        return new ZoneTakeoverSummaryRepresentation(zone.getName(), zone.getAreaName(), tp, pph, takeoverRepresentations);
     }
 
     @Transactional
