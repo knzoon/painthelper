@@ -3,6 +3,7 @@ package org.knzoon.painthelper.representation.compare;
 public class TakeoverRepresentationBuilder {
     private String takeoverTime;
     private String zoneName;
+    private Long zoneId;
     private String areaName;
     private Long areaId;
     private Integer tp;
@@ -22,6 +23,11 @@ public class TakeoverRepresentationBuilder {
 
     public TakeoverRepresentationBuilder withZoneName(String zoneName) {
         this.zoneName = zoneName;
+        return this;
+    }
+
+    public TakeoverRepresentationBuilder withZoneId(Long zoneId) {
+        this.zoneId = zoneId;
         return this;
     }
 
@@ -82,7 +88,8 @@ public class TakeoverRepresentationBuilder {
 
 
     public TakeoverRepresentation build() {
-        return new TakeoverRepresentation(takeoverTime, zoneName, areaName, areaId, tp, pph, activity, points, duration, previousUser, nextUser, assistingUser, accumulating);
+        return new TakeoverRepresentation(takeoverTime, zoneName, zoneId, areaName, areaId, tp, pph, activity, points,
+                duration, previousUser, nextUser, assistingUser, accumulating);
     }
 
 }

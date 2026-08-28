@@ -3,6 +3,7 @@ package org.knzoon.painthelper.representation.compare;
 public record TakeoverRepresentation(
     String takeoverTime,
     String zoneName,
+    Long zoneId,
     String areaName,
     Long areaId,
     Integer tp,
