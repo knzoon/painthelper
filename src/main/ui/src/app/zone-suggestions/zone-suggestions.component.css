@@ -87,9 +87,10 @@
 }
 
 .head3 {
-  width: 25px;
+  width: 30px;
   min-width: 25px;
   font-weight: bold;
+  text-align: right;
   margin-bottom: 4px;
   /*background: rosybrown;*/
 }
@@ -113,7 +114,7 @@
 }
 
 .col3 {
-  width: 25px;
+  width: 30px;
   min-width: 25px;
   overflow: hidden;
   text-align: right;

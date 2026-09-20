@@ -143,7 +143,7 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
         icon: numberIcon
       });
 
-      let popupContent: string = "<p style='font-size: 2em'><b>" + z.zoneName + "</b><br/>Tagen <b>" + z.takes + "</b> gånger</p>";
+      let popupContent: string = this.assemblePopupContent(z);
       marker.bindPopup(popupContent).openPopup();
 
       this.layerGroup.addLayer(marker);
@@ -186,6 +186,47 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
     }
 
     return iconBase + 'fetlila';
+  }
+
+  assemblePopupContent(zone: UniqueZone): string {
+    return "<p style='font-size: 2em'><b>" + zone.zoneName + "</b>" +
+      "<br/>Tagen <b>" + zone.takes + "</b> gånger</p>" +
+      this.pointsToNextColorString(zone.takes);
+  }
+
+  pointsToNextColorString(takes: number) : string {
+    let prefix : string = "<p style='font-size: 1.5em'>";
+    let postfix: string = "</p>";
+
+    if (takes < 1) {
+      return prefix + "1 take kvar till grön" + postfix;
+    }
+
+    if (takes < 2) {
+      return prefix + "1 take kvar till gul" + postfix;
+    }
+
+    if (takes < 11) {
+      let left : number = 11 - takes;
+      return prefix + "(" + left + " takes kvar till orange)" + postfix;
+    }
+
+    if (takes < 21) {
+      let left : number = 21 - takes;
+      return prefix + "(" + left + " takes kvar till röd)" + postfix;
+    }
+
+    if (takes < 51) {
+      let left : number = 51 - takes;
+      return prefix + "(" + left + " takes kvar till lila)" + postfix;
+    }
+
+    if (takes < 1000) {
+      let left : number = 1000 - takes;
+      return prefix + "(" + left + " takes kvar till fetlila)" + postfix;
+    }
+
+    return "";
   }
 
   clearMarkers(): void {
