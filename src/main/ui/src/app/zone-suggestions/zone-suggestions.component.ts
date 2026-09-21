@@ -195,38 +195,46 @@ export class ZoneSuggestionsComponent implements OnInit , AfterViewInit{
   }
 
   pointsToNextColorString(takes: number) : string {
-    let prefix : string = "<p style='font-size: 1.5em'>";
-    let postfix: string = "</p>";
+    let prefix : string = "<p style='font-size: 1.5em'>(";
+    let postfix: string = ")</p>";
 
     if (takes < 1) {
-      return prefix + "1 take kvar till grön" + postfix;
+      return prefix + "1" + this.takeLeftToString(1) + "grön" + postfix;
     }
 
     if (takes < 2) {
-      return prefix + "1 take kvar till gul" + postfix;
+      return prefix + "1" + this.takeLeftToString(1) + "gul" + postfix;
     }
 
     if (takes < 11) {
       let left : number = 11 - takes;
-      return prefix + "(" + left + " takes kvar till orange)" + postfix;
+      return prefix + left + this.takeLeftToString(left) + "orange" + postfix;
     }
 
     if (takes < 21) {
       let left : number = 21 - takes;
-      return prefix + "(" + left + " takes kvar till röd)" + postfix;
+      return prefix + left + this.takeLeftToString(left) + "röd" + postfix;
     }
 
     if (takes < 51) {
       let left : number = 51 - takes;
-      return prefix + "(" + left + " takes kvar till lila)" + postfix;
+      return prefix + left + this.takeLeftToString(left) + "lila" + postfix;
     }
 
     if (takes < 1000) {
       let left : number = 1000 - takes;
-      return prefix + "(" + left + " takes kvar till fetlila)" + postfix;
+      return prefix + left + this.takeLeftToString(left) + "fetlila" + postfix;
     }
 
     return "";
+  }
+
+  takeLeftToString(takes: number) : string {
+    if (takes > 1) {
+      return " takes kvar till ";
+    } else {
+      return " take kvar till ";
+    }
   }
 
   clearMarkers(): void {
