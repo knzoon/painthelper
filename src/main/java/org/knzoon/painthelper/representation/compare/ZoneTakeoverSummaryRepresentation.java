@@ -7,5 +7,6 @@ public record ZoneTakeoverSummaryRepresentation(
     String areaName,
     Integer tp,
     Integer pph,
-    List<ZoneTakeoverRepresentation> takeovers) {
+    List<ZoneTakeoverRepresentation> takeovers,
+    List<ZoneTakeoverTotalRepresentation> totals) {
 }

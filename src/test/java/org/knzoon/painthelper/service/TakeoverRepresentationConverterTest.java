@@ -19,15 +19,13 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TakeoverRepresentationConverterTest {
-    private final TakeoverRepresentationConverter converter = new TakeoverRepresentationConverter();
-
     @Test
     void correct_activity_when_takeover() {
         ZonedDateTime now = ZonedDateTime.now();
         User user = new User(313l, "john");
         Takeover takeover = new Takeover(185, TakeoverType.TAKEOVER, 42l, "Bridge", now.minusHours(1), user, 7, 95, null, null);
         Map<Long, Zone> zoneMap = new HashMap<>();
-        TakeoverRepresentation representation = converter.toRepresentation(takeover, now, zoneMap);
+        TakeoverRepresentation representation = TakeoverRepresentationConverter.toRepresentation(takeover, now, zoneMap);
         assertThat(representation.activity()).isEqualTo("TAKEOVER");
     }
 
@@ -38,7 +36,7 @@ class TakeoverRepresentationConverterTest {
         User assistingUser = new User(666l, "jane");
         Takeover takeover = new Takeover(185, TakeoverType.ASSIST, 42l, "Bridge", now.minusHours(1), user, 7, 95, null, assistingUser);
         Map<Long, Zone> zoneMap = new HashMap<>();
-        TakeoverRepresentation representation = converter.toRepresentation(takeover, now, zoneMap);
+        TakeoverRepresentation representation = TakeoverRepresentationConverter.toRepresentation(takeover, now, zoneMap);
         assertThat(representation.activity()).isEqualTo("ASSIST");
     }
 
@@ -48,7 +46,7 @@ class TakeoverRepresentationConverterTest {
         User user = new User(313l, "john");
         Takeover takeover = new Takeover(185, TakeoverType.TAKEOVER, 42l, "Bridge", now.minusHours(1), user, 7, 95, user, null);
         Map<Long, Zone> zoneMap = new HashMap<>();
-        TakeoverRepresentation representation = converter.toRepresentation(takeover, now, zoneMap);
+        TakeoverRepresentation representation = TakeoverRepresentationConverter.toRepresentation(takeover, now, zoneMap);
         assertThat(representation.activity()).isEqualTo("REVISIT");
     }
 }

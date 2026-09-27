@@ -1,6 +1,7 @@
 package org.knzoon.painthelper.service;
 
 import org.knzoon.painthelper.model.*;
+import org.knzoon.painthelper.model.compare.TakeoverSummaryForZone;
 import org.knzoon.painthelper.model.lazy.AverageScoreForZones;
 import org.knzoon.painthelper.representation.LatestTakeoverInfoRepresentation;
 import org.knzoon.painthelper.representation.compare.*;
@@ -24,17 +25,14 @@ public class TakeoverService {
     private final TakeoverRepository takeoverRepository;
     private final UserRepository userRepository;
     private final ZoneRepository zoneRepository;
-    private  final TakeoverRepresentationConverter takeoverRepresentationConverter;
 
     @Autowired
     public TakeoverService(TakeoverRepository takeoverRepository,
                            UserRepository userRepository,
-                           ZoneRepository zoneRepository,
-                           TakeoverRepresentationConverter takeoverRepresentationConverter) {
+                           ZoneRepository zoneRepository) {
         this.takeoverRepository = takeoverRepository;
         this.userRepository = userRepository;
         this.zoneRepository = zoneRepository;
-        this.takeoverRepresentationConverter = takeoverRepresentationConverter;
     }
 
     @Transactional
@@ -181,7 +179,7 @@ public class TakeoverService {
         List<List<Route>> routesPerDayInRound = takeoversInRound.getRoutesPerDay();
 
         return routesPerDayInRound.stream()
-                .map(routesInDay -> takeoverRepresentationConverter.toRepresentation(routesInDay, now, zoneMap))
+                .map(routesInDay -> TakeoverRepresentationConverter.toRepresentation(routesInDay, now, zoneMap))
                 .toList();
     }
 
@@ -203,20 +201,19 @@ public class TakeoverService {
         }
 
         Zone zone = foundZone.get();
-
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
         Integer roundId = RoundCalculator.roundFromDateTime(now);
 
         List<Takeover> takeovers = takeoverRepository.findforRoundAndZone(roundId, zoneId);
 
-        List<ZoneTakeoverRepresentation> takeoverRepresentations = takeovers.stream()
-                .map(takeover -> takeoverRepresentationConverter.toZoneTakeoverRepresentation(takeover, now))
-                .toList();
-
-        int tp = takeovers.isEmpty() ? 0 : takeovers.getFirst().getTp();
-        int pph = takeovers.isEmpty() ? 0 : takeovers.getFirst().getPph();
-
-        return new ZoneTakeoverSummaryRepresentation(zone.getName(), zone.getAreaName(), tp, pph, takeoverRepresentations);
+        TakeoverSummaryForZone summary = new TakeoverSummaryForZone(takeovers, now);
+        return new ZoneTakeoverSummaryRepresentation(
+                zone.getName(),
+                zone.getAreaName(),
+                summary.getTp(),
+                summary.getPph(),
+                summary.getTakeovers(),
+                summary.getTotalsPerUser());
     }
 
     @Transactional

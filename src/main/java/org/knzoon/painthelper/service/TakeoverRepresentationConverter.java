@@ -16,22 +16,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
 public class TakeoverRepresentationConverter {
 
-    public List<List<TakeoverRepresentation>> toRepresentation(List<Route> routesInDay, ZonedDateTime now, Map<Long, Zone> zoneMap) {
+    private TakeoverRepresentationConverter() {
+    }
+
+    public static List<List<TakeoverRepresentation>> toRepresentation(List<Route> routesInDay, ZonedDateTime now, Map<Long, Zone> zoneMap) {
         return routesInDay.stream()
                 .map(route -> toRepresentation(route, now, zoneMap))
                 .toList();
     }
 
-    List<TakeoverRepresentation> toRepresentation(Route route, ZonedDateTime now, Map<Long, Zone> zoneMap) {
+    static List<TakeoverRepresentation> toRepresentation(Route route, ZonedDateTime now, Map<Long, Zone> zoneMap) {
         return route.takeovers().stream()
                 .map(takeover -> toRepresentation(takeover, now, zoneMap))
                 .toList();
     }
 
-    TakeoverRepresentation toRepresentation(Takeover takeover, ZonedDateTime now, Map<Long, Zone> zoneMap) {
+    static TakeoverRepresentation toRepresentation(Takeover takeover, ZonedDateTime now, Map<Long, Zone> zoneMap) {
         PointsInDay pointsUntilNow = takeover.pointsUntilNow(now);
         Optional<Zone> zone = Optional.ofNullable(zoneMap.get(takeover.getZoneId()));
         var builder = TakeoverRepresentation.builder();
@@ -53,15 +55,15 @@ public class TakeoverRepresentationConverter {
         return builder.build();
     }
 
-    private String takeovetimeConverter(ZonedDateTime takeovertime) {
+    static private String takeovetimeConverter(ZonedDateTime takeovertime) {
         return UTCSwedishTimeConverter.convert(takeovertime).format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 
-    private String takeovetimeWithDateConverter(ZonedDateTime takeovertime) {
+    static private String takeovetimeWithDateConverter(ZonedDateTime takeovertime) {
         return UTCSwedishTimeConverter.convert(takeovertime).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
-    ZoneTakeoverRepresentation toZoneTakeoverRepresentation(Takeover takeover, ZonedDateTime now) {
+    public static ZoneTakeoverRepresentation toZoneTakeoverRepresentation(Takeover takeover, ZonedDateTime now) {
         PointsInDay pointsUntilNow = takeover.pointsUntilNow(now);
 
         return new ZoneTakeoverRepresentation(
