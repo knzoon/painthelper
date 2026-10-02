@@ -2,22 +2,32 @@ package org.knzoon.painthelper.model;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Route {
     private final List<Takeover> takeovers;
 
     public Route() {
-        takeovers = new ArrayList<>();
+        takeovers = List.of();
     }
 
     public Route(Takeover takeover) {
-        takeovers = new ArrayList<>();
-        add(takeover);
+        takeovers = List.of(takeover);
     }
 
-    public void add(Takeover takeover) {
-        takeovers.add(takeover);
+    private Route(List<Takeover> takeovers) {
+        this.takeovers = Collections.unmodifiableList(takeovers);
+    }
+
+    /**
+     * Route is unmutable so add() returns a new Route
+     * */
+    public Route add(Takeover takeover) {
+        List<Takeover> takeoversWithAddedTakeover = new ArrayList<>();
+        takeoversWithAddedTakeover.addAll(takeovers);
+        takeoversWithAddedTakeover.add(takeover);
+        return new Route(takeoversWithAddedTakeover);
     }
 
     public boolean shouldContain(Takeover takeover) {
