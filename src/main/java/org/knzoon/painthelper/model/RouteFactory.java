@@ -1,5 +1,6 @@
 package org.knzoon.painthelper.model;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,12 +10,12 @@ public class RouteFactory {
 
     }
 
-    public static List<Route> from(List<Takeover> takeovers) {
+    public static List<Route> from(ZonedDateTime now, List<Takeover> takeovers) {
         if (takeovers == null) {
             return List.of();
         }
 
-        Route currentRoute = new Route();
+        Route currentRoute = new Route(now);
         List<Route> routes = new ArrayList<>();
 
         for (Takeover takeover : takeovers) {
@@ -22,7 +23,7 @@ public class RouteFactory {
                 currentRoute.add(takeover);
             } else {
                 routes.add(currentRoute);
-                currentRoute = new Route(takeover);
+                currentRoute = new Route(now, takeover);
             }
         }
 

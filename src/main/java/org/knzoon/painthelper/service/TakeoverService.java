@@ -48,21 +48,20 @@ public class TakeoverService {
         List<Takeover> takeovers = takeoverRepository.findAllByRoundIdAndUserOrderById(roundId, user);
 
         ZonedDateTime now = Instant.now().atZone(ZoneId.of("UTC"));
-        List<Route> filteredRoutes = RouteFactory.from(takeovers)
+        List<Route> routes = RouteFactory.from(now, takeovers);
+        List<Route> filteredRoutes = routes
                 .stream()
                 .filter(Route::hasMoreThanOneTake)
                 .collect(Collectors.toList());
 
-        List<PointsInDay> pointsPerDay = takeovers.stream().map(t -> t.pointsUntilNow(now)).collect(Collectors.toList());
-
         return new TurfEffortRepresentation(
                 username,
                 calculateTimeSpentInRoutes(filteredRoutes),
-                calculatePointsForTakeovers(pointsPerDay),
+                calculatePointsForTakeovers(routes),
                 takeovers.size(),
                 filteredRoutes.size(),
                 getTakesInRoutes(filteredRoutes),
-                calculatePphForTakeovers(pointsPerDay),
+                calculatePphForTakeovers(routes),
                 PphDistributionFactory.createForUniqueZones(takeovers),
                 PphDistributionFactory.createForAllTakeovers(takeovers));
     }
@@ -72,13 +71,19 @@ public class TakeoverService {
         return DurationFormatter.format(totalDuration);
     }
 
-    private Integer calculatePointsForTakeovers(List<PointsInDay> pointsPerDay) {
-        Double points = pointsPerDay.stream().map(PointsInDay::getTotal).collect(Collectors.summingDouble(Double::doubleValue));
+    private Integer calculatePointsForTakeovers(List<Route> routes) {
+        Double points = routes.stream()
+                .map(Route::totalPoints)
+                .map(PointsInDay::getTotal)
+                .collect(Collectors.summingDouble(Double::doubleValue));
         return (int) Math.round(points);
     }
 
-    private Integer calculatePphForTakeovers(List<PointsInDay> pointsPerDay) {
-        Double points = pointsPerDay.stream().map(PointsInDay::getPph).collect(Collectors.summingDouble(Double::doubleValue));
+    private Integer calculatePphForTakeovers(List<Route> routes) {
+        Double points = routes.stream()
+                .map(Route::totalPoints)
+                .map(PointsInDay::getPph)
+                .collect(Collectors.summingDouble(Double::doubleValue));
         return (int) Math.round(points);
     }
 

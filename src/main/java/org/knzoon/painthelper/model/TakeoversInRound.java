@@ -46,7 +46,7 @@ public class TakeoversInRound {
         List<List<Route>> routesPerDay = new ArrayList<>();
 
         for (int i = 1; i < currentDayOfRound + 1; i++) {
-            routesPerDay.add(RouteFactory.from(takeoversPerDay.get(i)));
+            routesPerDay.add(RouteFactory.from(now, takeoversPerDay.get(i)));
         }
 
         return routesPerDay;

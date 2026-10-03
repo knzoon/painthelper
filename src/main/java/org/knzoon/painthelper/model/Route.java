@@ -1,23 +1,31 @@
 package org.knzoon.painthelper.model;
 
 import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Route {
     private final List<Takeover> takeovers;
+    private final ZonedDateTime now;
+    private PointsInDay pointsInDayTotal;
 
-    public Route() {
+    public Route(ZonedDateTime now) {
         takeovers = new ArrayList<>();
+        this.now = now;
+        this.pointsInDayTotal = PointsInDay.ZERO;
     }
 
-    public Route(Takeover takeover) {
+    public Route(ZonedDateTime now, Takeover takeover) {
+        this.now = now;
         takeovers = new ArrayList<>();
-        add(takeover);
+        takeovers.add(takeover);
+        pointsInDayTotal = takeover.pointsUntilNow(now);
     }
 
     public void add(Takeover takeover) {
         takeovers.add(takeover);
+        pointsInDayTotal = pointsInDayTotal.add(takeover.pointsUntilNow(now));
     }
 
     public boolean shouldContain(Takeover takeover) {
@@ -56,5 +64,9 @@ public class Route {
 
     public List<Takeover> takeovers() {
         return takeovers;
+    }
+
+    public PointsInDay totalPoints() {
+        return pointsInDayTotal;
     }
 }
