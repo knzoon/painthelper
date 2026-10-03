@@ -19,7 +19,7 @@ public class RouteFactory {
 
         for (Takeover takeover : takeovers) {
             if (currentRoute.shouldContain(takeover)) {
-                currentRoute = currentRoute.add(takeover);
+                currentRoute.add(takeover);
             } else {
                 routes.add(currentRoute);
                 currentRoute = new Route(takeover);
