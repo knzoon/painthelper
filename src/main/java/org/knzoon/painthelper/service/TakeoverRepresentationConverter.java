@@ -4,6 +4,8 @@ import org.knzoon.painthelper.model.PointsInDay;
 import org.knzoon.painthelper.model.Route;
 import org.knzoon.painthelper.model.Takeover;
 import org.knzoon.painthelper.model.Zone;
+import org.knzoon.painthelper.representation.compare.RouteRepresentation;
+import org.knzoon.painthelper.representation.compare.RouteTotalRepresentation;
 import org.knzoon.painthelper.representation.compare.TakeoverRepresentation;
 import org.knzoon.painthelper.representation.compare.ZoneTakeoverRepresentation;
 import org.knzoon.painthelper.util.DurationFormatter;
@@ -21,16 +23,16 @@ public class TakeoverRepresentationConverter {
     private TakeoverRepresentationConverter() {
     }
 
-    public static List<List<TakeoverRepresentation>> toRepresentation(List<Route> routesInDay, ZonedDateTime now, Map<Long, Zone> zoneMap) {
+    public static List<RouteRepresentation> toRepresentation(List<Route> routesInDay, ZonedDateTime now, Map<Long, Zone> zoneMap) {
         return routesInDay.stream()
                 .map(route -> toRepresentation(route, now, zoneMap))
                 .toList();
     }
 
-    static List<TakeoverRepresentation> toRepresentation(Route route, ZonedDateTime now, Map<Long, Zone> zoneMap) {
-        return route.takeovers().stream()
+    static RouteRepresentation toRepresentation(Route route, ZonedDateTime now, Map<Long, Zone> zoneMap) {
+        return new RouteRepresentation(route.takeovers().stream()
                 .map(takeover -> toRepresentation(takeover, now, zoneMap))
-                .toList();
+                .toList());
     }
 
     static TakeoverRepresentation toRepresentation(Takeover takeover, ZonedDateTime now, Map<Long, Zone> zoneMap) {
@@ -71,5 +73,21 @@ public class TakeoverRepresentationConverter {
                 takeover.getUser().getUsername(),
                 pointsUntilNow.getTotalRounded(),
                 DurationFormatter.format(pointsUntilNow.getDuration()));
+    }
+
+    public static List<RouteTotalRepresentation> toRouteTotalRepresentation(List<Route> routesInDay) {
+        return routesInDay.stream()
+                .map(TakeoverRepresentationConverter::toRouteTotalRepresentation)
+                .toList();
+    }
+
+    static RouteTotalRepresentation toRouteTotalRepresentation(Route route) {
+        return new RouteTotalRepresentation(
+                route.nrofTakes(),
+                takeovetimeWithDateConverter(route.firstTakeovertime()),
+                DurationFormatter.format(route.timeSpent()),
+                route.pointsTotal(),
+                route.pointsTp(),
+                route.pointsPph());
     }
 }

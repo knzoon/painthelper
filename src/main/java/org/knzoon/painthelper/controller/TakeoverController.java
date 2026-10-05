@@ -40,7 +40,7 @@ public class TakeoverController {
 
     @CrossOrigin(origins = "http://localhost:4200")
     @GetMapping("/api/takeover/user/{username}")
-    public List<List<List<TakeoverRepresentation>>> getTakeoversForUser(@PathVariable(value = "username") String username) {
+    public List<TakeoversInDayRepresentation> getTakeoversForUser(@PathVariable(value = "username") String username) {
         return takeoverService.getTakeoversForUser(username);
     }
 

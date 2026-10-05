@@ -69,4 +69,24 @@ public class Route {
     public PointsInDay totalPoints() {
         return pointsInDayTotal;
     }
+
+    public ZonedDateTime firstTakeovertime() {
+        if (takeovers.isEmpty()) {
+            return null;
+        }
+
+        return takeovers.getFirst().getTakeoverTime();
+    }
+
+    public Integer pointsTotal() {
+        return pointsInDayTotal.getTotalRounded();
+    }
+
+    public Integer pointsTp() {
+        return pointsInDayTotal.getTakepointRounded();
+    }
+
+    public Integer pointsPph() {
+        return pointsInDayTotal.getPphRounded();
+    }
 }

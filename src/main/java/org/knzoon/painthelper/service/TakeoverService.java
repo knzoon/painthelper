@@ -166,7 +166,7 @@ public class TakeoverService {
     }
 
     @Transactional
-    public List<List<List<TakeoverRepresentation>>> getTakeoversForUser(String username) {
+    public List<TakeoversInDayRepresentation> getTakeoversForUser(String username) {
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
@@ -184,7 +184,9 @@ public class TakeoverService {
         List<List<Route>> routesPerDayInRound = takeoversInRound.getRoutesPerDay();
 
         return routesPerDayInRound.stream()
-                .map(routesInDay -> TakeoverRepresentationConverter.toRepresentation(routesInDay, now, zoneMap))
+                .map(routesInDay -> new TakeoversInDayRepresentation(
+                        TakeoverRepresentationConverter.toRouteTotalRepresentation(routesInDay),
+                        TakeoverRepresentationConverter.toRepresentation(routesInDay, now, zoneMap)))
                 .toList();
     }
 
