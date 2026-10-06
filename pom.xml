@@ -20,7 +20,7 @@
 		<repository>
 			<id>internal.repo</id>
 			<name>Internal repo</name>
-			<url>file:///hobby/knzoon/repo</url>
+			<url>file:///home/olap0001/knzoon/repo</url>
 		</repository>
 	</distributionManagement>
 	<properties>
